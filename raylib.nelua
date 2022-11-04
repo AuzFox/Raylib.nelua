@@ -729,31 +729,46 @@ function rl.initWindow(width: cint, height: cint, title: cstring): void <cimport
 function rl.windowShouldClose(): boolean <cimport'WindowShouldClose', cinclude'<raylib.h>', nodecl> end -- Check if KEY_ESCAPE pressed or Close icon pressed
 function rl.closeWindow(): void <cimport'CloseWindow', cinclude'<raylib.h>', nodecl> end -- Close window and unload OpenGL context
 function rl.isWindowReady(): boolean <cimport'IsWindowReady', cinclude'<raylib.h>', nodecl> end -- Check if window has been initialized successfully
-function rl.isWindowMinimized(): boolean <cimport'IsWindowMinimized', cinclude'<raylib.h>', nodecl> end -- Check if window has been minimized (or lost focus)
+function rl.isWindowMinimized(): boolean <cimport'IsWindowMinimized', cinclude'<raylib.h>', nodecl> end -- Check if window is currently minimized (only PLATFORM_DESKTOP)
+function rl.isWindowMaximized(): boolean <cimport'IsWindowMaximized', cinclude'<raylib.h>', nodecl> end -- Check if window is currently maximized (only PLATFORM_DESKTOP)
+function rl.isWindowFocused(): boolean <cimport'IsWindowFocused', cinclude'<raylib.h>', nodecl> end -- Check if window is currently focused (only PLATFORM_DESKTOP)
 function rl.isWindowResized(): boolean <cimport'IsWindowResized', cinclude'<raylib.h>', nodecl> end -- Check if window has been resized
+function rl.isWindowState(flag: cuint): boolean <cimport'IsWindowState', cinclude'<raylib.h>', nodecl> end -- Check if one specific window flag is enabled
+function rl.setWindowState(flags: cuint): void <cimport'SetWindowState', cinclude'<raylib.h>', nodecl> end -- Set window configuration state using flags (only PLATFORM_DESKTOP)
+function rl.clearWindowState(): void <cimport'SetWindowState', cinclude'<raylib.h>', nodecl> end -- Clear window configuration state flags
 function rl.isWindowHidden(): boolean <cimport'IsWindowHidden', cinclude'<raylib.h>', nodecl> end -- Check if window is currently hidden
 function rl.isWindowFullscreen(): boolean <cimport'IsWindowFullscreen', cinclude'<raylib.h>', nodecl> end -- Check if window is currently fullscreen
 function rl.toggleFullscreen(): void <cimport'ToggleFullscreen', cinclude'<raylib.h>', nodecl> end -- Toggle fullscreen mode (only PLATFORM_DESKTOP)
-function rl.unhideWindow(): void <cimport'UnhideWindow', cinclude'<raylib.h>', nodecl> end -- Show the window
-function rl.hideWindow(): void <cimport'HideWindow', cinclude'<raylib.h>', nodecl> end -- Hide the window
+function rl.maximizeWindow(): void <cimport'MaximizeWindow', cinclude'<raylib.h>', nodecl> end -- Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
+function rl.minimizeWindow(): void <cimport'MinimizeWindow', cinclude'<raylib.h>', nodecl> end -- Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
+function rl.restoreWindow(): void <cimport'RestoreWindow', cinclude'<raylib.h>', nodecl> end -- Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
 function rl.setWindowIcon(image: rl.image): void <cimport'SetWindowIcon', cinclude'<raylib.h>', nodecl> end -- Set icon for window (only PLATFORM_DESKTOP)
 function rl.setWindowTitle(title: cstring): void <cimport'SetWindowTitle', cinclude'<raylib.h>', nodecl> end -- Set title for window (only PLATFORM_DESKTOP)
 function rl.setWindowPosition(x: cint, y: cint): void <cimport'SetWindowPosition', cinclude'<raylib.h>', nodecl> end -- Set window position on screen (only PLATFORM_DESKTOP)
 function rl.setWindowMonitor(monitor: cint): void <cimport'SetWindowMonitor', cinclude'<raylib.h>', nodecl> end -- Set monitor for the current window (fullscreen mode)
 function rl.setWindowMinSize(width: cint, height: cint): void <cimport'SetWindowMinSize', cinclude'<raylib.h>', nodecl> end -- Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
 function rl.setWindowSize(width: cint, height: cint): void <cimport'SetWindowSize', cinclude'<raylib.h>', nodecl> end -- Set window dimensions
+function rl.setWindowOpacity(opacity: float32): void <cimport'SetWindowOpacity', cinclude'raylib.h', nodecl>
 function rl.getWindowHandle(): pointer <cimport'GetWindowHandle', cinclude'<raylib.h>', nodecl> end -- Get native window handle
 function rl.getScreenWidth(): cint <cimport'GetScreenWidth', cinclude'<raylib.h>', nodecl> end -- Get current screen width
 function rl.getScreenHeight(): cint <cimport'GetScreenHeight', cinclude'<raylib.h>', nodecl> end -- Get current screen height
+function rl.getRenderWidth(): void <cimport'GetRenderWidth', cinclude'raylib.h', nodecl> -- Get current render width (it considers HiDPI)
+function rl.getRenderHeight(): void <cimport'GetRenderHeight', cinclude'raylib.h', nodecl> -- Get current render height (it considers HiDPI)
 function rl.getMonitorCount(): cint <cimport'GetMonitorCount', cinclude'<raylib.h>', nodecl> end -- Get number of connected monitors
+function rl.getCurrentMonitor(): cint <cimport'GetCurrentMonitor', cinclude'<raylib.h>', nodecl> end -- Get number of connected monitors
+function rl.getMonitorPosition(monitor: cint): rl.vector2 <cimport'GetMonitorPosition', cinclude'<raylib.h>', nodecl> end -- Get specified monitor position
 function rl.getMonitorWidth(monitor: cint): cint <cimport'GetMonitorWidth', cinclude'<raylib.h>', nodecl> end -- Get primary monitor width
 function rl.getMonitorHeight(monitor: cint): cint <cimport'GetMonitorHeight', cinclude'<raylib.h>', nodecl> end -- Get primary monitor height
 function rl.getMonitorPhysicalWidth(monitor: cint): cint <cimport'GetMonitorPhysicalWidth', cinclude'<raylib.h>', nodecl> end -- Get primary monitor physical width in millimetres
 function rl.getMonitorPhysicalHeight(monitor: cint): cint <cimport'GetMonitorPhysicalHeight', cinclude'<raylib.h>', nodecl> end -- Get primary monitor physical height in millimetres
+function rl.getMonitorRefreshRate(monitor: cint): cint <cimport'GetMonitorRefreshRate', cinclude'<raylib.h>', nodecl> end -- Get specified monitor refresh rate
 function rl.getWindowPosition(): rl.vector2 <cimport'GetWindowPosition', cinclude'<raylib.h>', nodecl> end -- Get window position XY on monitor
+function rl.getWindowScaleDPI(): rl.vector2 <cimport'GetWindowScaleDPI', cinclude'<raylib.h>', nodecl> end -- Get window scale DPI factor
 function rl.getMonitorName(monitor: cint): cstring <cimport'GetMonitorName', cinclude'<raylib.h>', nodecl> end -- Get the human-readable, UTF-8 encoded name of the primary monitor
 function rl.getClipboardText(): cstring <cimport'GetClipboardText', cinclude'<raylib.h>', nodecl> end -- Get clipboard text content
 function rl.setClipboardText(text: cstring): void <cimport'SetClipboardText', cinclude'<raylib.h>', nodecl> end -- Set clipboard text content
+function rl.enableEventWaiting(): void <cimport'EnableEventWaiting', cinclude'<raylib.h>', nodecl> end -- Enable waiting for events on EndDrawing(), no automatic event polling
+function rl.disableEventWaiting(): void <cimport'DisableEventWaiting', cinclude'<raylib.h>', nodecl> end -- Disable waiting for events on EndDrawing(), automatic events polling
 
 -- Custom frame control functions
 -- NOTE: Those functions are intended for advance users that want full control over the frame processing
@@ -916,6 +931,7 @@ function rl.setMousePosition(x: cint, y: cint): void <cimport'SetMousePosition',
 function rl.setMouseOffset(offsetX: cint, offsetY: cint): void <cimport'SetMouseOffset', cinclude'<raylib.h>',nodecl> end
 function rl.setMouseScale(scaleX: float32, scaleY: float32): void <cimport'SetMouseScale', cinclude'<raylib.h>',nodecl> end
 function rl.getMouseWheelMove(): float32 <cimport'GetMouseWheelMove', cinclude'<raylib.h>',nodecl> end
+function rl.getMouseWheelMoveV(): rl.vector2 <cimport'GetMouseWheelMoveV', cinclude'<raylib.h>',nodecl> end
 function rl.setMouseCursor(cursor: cint): void <cimport'SetMouseCursor', cinclude'<raylib.h>',nodecl> end
 
 -- Input-related functions: touch
@@ -1139,6 +1155,7 @@ function rl.loadFontData(fileData: *cuchar, dataSize: cint, fontSize: cint, font
 function rl.genImageFontAtlas(chars: *rl.glyphInfo, recs: **rl.rectangle, charsCount: cint, fontSize: cint, padding: cint, packMethod: cint): rl.image <cimport'GenImageFontAtlas', cinclude'<raylib.h>',nodecl> end
 function rl.unloadFontData(chars: *rl.glyphInfo, charsCount: cint): void <cimport'UnloadFontData', cinclude'<raylib.h>',nodecl> end
 function rl.unloadFont(font: rl.font): void <cimport'UnloadFont', cinclude'<raylib.h>',nodecl> end
+function rl.exportFontAsCode(font: rl.font, fileName: cstring): boolean void <cimport'ExportFontAsCode', cinclude'<raylib.h>',nodecl> end
 
 -- Text drawing functions
 function rl.drawFPS(posX: cint, posY: cint): void <cimport'DrawFPS', cinclude'<raylib.h>',nodecl> end
@@ -1146,6 +1163,7 @@ function rl.drawText(text: cstring, posX: cint, posY: cint, fontSize: cint, colo
 function rl.drawTextEx(font: rl.font, text: cstring, position: rl.vector2, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawTextPro(font: rl.font, text: cstring, position: rl.vector2, origin: rl.vector2, rotation: float32, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextPro', cinclude'<raylib.h>',nodecl> end
 function rl.drawTextCodepoint(font: rl.font, codepoint: cint, position: rl.vector2, fontSize: float32, tint: rl.color): void <cimport'DrawTextCodepoint', cinclude'<raylib.h>',nodecl> end
+function rl.drawTextCodepoints(font: rl.font, codepoints: cint, count: cint, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextCodepoints', cinclude'<raylib.h>',nodecl> end
 
 -- Text font info functions
 function rl.MeasureText(text: cstring, fontSize: cint): cint <cimport'MeasureText', cinclude'<raylib.h>',nodecl> end
@@ -1194,7 +1212,8 @@ function rl.drawCube(position: rl.vector3, width: float32, height: float32, leng
 function rl.drawCubeV(position: rl.vector3, size: rl.vector3, color: rl.color): void <cimport'DrawCubeV', cinclude'<raylib.h>',nodecl> end
 function rl.drawCubeWires(position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'DrawCubeWires', cinclude'<raylib.h>',nodecl> end
 function rl.drawCubeWiresV(position: rl.vector3, size: rl.vector3, color: rl.color): void <cimport'DrawCubeWiresV', cinclude'<raylib.h>',nodecl> end
-function rl.drawCubetexture(texture: rl.texture2D, position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'DrawCubetexture', cinclude'<raylib.h>',nodecl> end
+function rl.drawCubeTexture(texture: rl.texture2D, position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'DrawCubetexture', cinclude'<raylib.h>',nodecl> end
+function rl.DrawCubeTextureRec(texture: rl.texture2D, source: rl.rectangle, position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'DrawCubeTextureRec', cinclude'<raylib.h>',nodecl> end
 function rl.drawSphere(centerPos: rl.vector3, radius: float32, color: rl.color): void <cimport'DrawSphere', cinclude'<raylib.h>',nodecl> end
 function rl.drawSphereEx(centerPos: rl.vector3, radius: float32, rings: cint, slices: cint, color: rl.color): void <cimport'DrawSphereEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawSphereWires(centerPos: rl.vector3, radius: float32, rings: cint, slices: cint, color: rl.color): void <cimport'DrawSphereWires', cinclude'<raylib.h>',nodecl> end
@@ -1236,7 +1255,6 @@ function rl.drawMeshInstanced(mesh: rl.mesh, material: rl.material, transforms: 
 function rl.exportMesh(mesh: rl.mesh, fileName: cstring): boolean <cimport'ExportMesh', cinclude'<raylib.h>',nodecl> end
 function rl.getMeshBoundingBox(mesh: rl.mesh): rl.boundingBox <cimport'GetMeshBoundingBox', cinclude'<raylib.h>',nodecl> end
 function rl.genMeshTangents(mesh: *rl.mesh): void <cimport'GenMeshTangents', cinclude'<raylib.h>',nodecl> end
-function rl.genMeshBinormals(mesh: *rl.mesh): void <cimport'GenMeshBinormals', cinclude'<raylib.h>',nodecl> end
 
 -- Mesh generation functions
 function rl.genMeshPoly(sides: cint, radius: float32): rl.mesh <cimport'GenMeshPoly', cinclude'<raylib.h>',nodecl> end
@@ -1245,6 +1263,7 @@ function rl.genMeshCube(width: float32, height: float32, length: float32): rl.me
 function rl.genMeshSphere(radius: float32, rings: cint, slices: cint): rl.mesh <cimport'GenMeshSphere', cinclude'<raylib.h>',nodecl> end
 function rl.genMeshHemiSphere(radius: float32, rings: cint, slices: cint): rl.mesh <cimport'GenMeshHemiSphere', cinclude'<raylib.h>',nodecl> end
 function rl.genMeshCylinder(radius: float32, height: float32, slices: cint): rl.mesh <cimport'GenMeshCylinder', cinclude'<raylib.h>',nodecl> end
+function rl.genMeshCone(radius: float32, height: float32, slices: cint): rl.mesh <cimport'GenMeshCone', cinclude'<raylib.h>',nodecl> end
 function rl.genMeshTorus(radius: float32, size: float32, radSeg: cint, sides: cint): rl.mesh <cimport'GenMeshTorus', cinclude'<raylib.h>',nodecl> end
 function rl.genMeshKnot(radius: float32, size: float32, radSeg: cint, sides: cint): rl.mesh <cimport'GenMeshKnot', cinclude'<raylib.h>',nodecl> end
 function rl.genMeshHeightmap(heightmap: rl.image, size: rl.vector3): rl.mesh <cimport'GenMeshHeightmap', cinclude'<raylib.h>',nodecl> end
@@ -1270,7 +1289,6 @@ function rl.checkCollisionBoxes(box1: rl.boundingBox, box2: rl.boundingBox): boo
 function rl.checkCollisionBoxSphere(box: rl.boundingBox, center: rl.vector3, radius: float32): boolean <cimport'CheckCollisionBoxSphere', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionSphere(box: rl.boundingBox, center: rl.vector3, radius: float32): rl.rayCollision <cimport'CheckCollisionBoxSphere', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionBox(ray: rl.ray, box: rl.boundingBox): rl.rayCollision <cimport'GetRayCollisionBox', cinclude'<raylib.h>',nodecl> end
-function rl.getRayCollisionModel(ray: rl.ray, model: rl.model): rl.rayCollision <cimport'GetRayCollisionModel', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionTriangle(ray: rl.ray, p1: rl.vector3, p2: rl.vector3, p3: rl.vector3): rl.rayCollision <cimport'GetRayCollisionTriangle', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionQuad(ray: rl.ray, p1: rl.vector3, p2: rl.vector3, p3: rl.vector3, p4: rl.vector3): rl.rayCollision <cimport'GetRayCollisionQuad', cinclude'<raylib.h>',nodecl> end
 
@@ -1306,6 +1324,7 @@ function rl.getSoundsPlaying(): cint <cimport'GetSoundsPlaying', cinclude'<rayli
 function rl.isSoundPlaying(sound: rl.sound): boolean <cimport'IsSoundPlaying', cinclude'<raylib.h>',nodecl> end
 function rl.setSoundVolume(sound: rl.sound, volume: float32): void <cimport'SetSoundVolume', cinclude'<raylib.h>',nodecl> end
 function rl.setSoundPitch(sound: rl.sound, pitch: float32): void <cimport'SetSoundPitch', cinclude'<raylib.h>',nodecl> end
+function rl.setSoundPan(sound: rl.sound. pan: float32): void <cimport'SetSoundPan', cinclude'<raylib.h>',nodecl> end
 function rl.waveFormat(wave: *rl.wave, sampleRate: cint, sampleSize: cint, channels: cint): void <cimport'WaveFormat', cinclude'<raylib.h>',nodecl> end
 function rl.waveCopy(wave: rl.wave): rl.wave <cimport'WaveCopy', cinclude'<raylib.h>',nodecl> end
 function rl.waveCrop(wave: *rl.wave, initSample: cint, finalSample: cint): void <cimport'WaveCrop', cinclude'<raylib.h>',nodecl> end
@@ -1318,6 +1337,7 @@ function rl.loadMusicStreamFromMemory(fileType: cstring, data: *cuchar, dataSize
 function rl.unloadMusicStream(music: rl.music): void <cimport'UnloadMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.playMusicStream(music: rl.music): void <cimport'PlayMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.isMusicPlaying(music: rl.music): boolean <cimport'IsMusicPlaying', cinclude'<raylib.h>',nodecl> end
+function rl.IsMusicStreamPlaying(music: rl.music): boolean <cimport'IsMusicStreamPlaying', cinclude'<raylib.h>',nodecl> end
 function rl.updateMusicStream(music: rl.music): void <cimport'UpdateMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.stopMusicStream(music: rl.music): void <cimport'StopMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.pauseMusicStream(music: rl.music): void <cimport'PauseMusicStream', cinclude'<raylib.h>',nodecl> end
@@ -1325,11 +1345,13 @@ function rl.resumeMusicStream(music: rl.music): void <cimport'ResumeMusicStream'
 function rl.seekMusicStream(music: rl.music, position: float32): void <cimport'SeekMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.setMusicVolume(music: rl.music, volume: float32): void <cimport'SetMusicVolume', cinclude'<raylib.h>',nodecl> end
 function rl.setMusicPitch(music: rl.music, pitch: float32): void <cimport'SetMusicPitch', cinclude'<raylib.h>',nodecl> end
+function rl.setMusicPan(sound: rl.music. pan: float32): void <cimport'SetMusicPan', cinclude'<raylib.h>',nodecl> end
 function rl.getMusicTimeLength(music: rl.music): float32 <cimport'GetMusicTimeLength', cinclude'<raylib.h>',nodecl> end
 function rl.getMusicTimePlayed(music: rl.music): float32 <cimport'GetMusicTimePlayed', cinclude'<raylib.h>',nodecl> end
 
 -- AudioStream management functions
 function rl.loadAudioStream(sampleRate: cuint, sampleSize: cuint, channels: cuint): rl.audioStream <cimport'LoadAudioStream', cinclude'<raylib.h>',nodecl> end
+function rl.unloadAudioStream(stream: rl.audioStream): void <cimport'UnloadAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.updateAudioStream(stream: rl.audioStream, data: pointer, samplesCount: cint): void <cimport'UpdateAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.isAudioStreamProcessed(stream: rl.audioStream): boolean <cimport'IsAudioStreamProcessed', cinclude'<raylib.h>',nodecl> end
 function rl.playAudioStream(stream: rl.audioStream): void <cimport'PlayAudioStream', cinclude'<raylib.h>',nodecl> end
@@ -1339,6 +1361,7 @@ function rl.isAudioStreamPlaying(stream: rl.audioStream): boolean <cimport'IsAud
 function rl.stopAudioStream(stream: rl.audioStream): void <cimport'StopAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.setAudioStreamVolume(stream: rl.audioStream, volume: float32): void <cimport'SetAudioStreamVolume', cinclude'<raylib.h>',nodecl> end
 function rl.setAudioStreamPitch(stream: rl.audioStream, pitch: float32): void <cimport'SetAudioStreamPitch', cinclude'<raylib.h>',nodecl> end
+function rl.setAudioStreamPan(stream: rl.audioStream, pan: float32): void <cimport'SetAudioStreamPan', cinclude'<raylib.h>',nodecl> end
 function rl.setAudioStreamBufferSizeDefault(size: cint): void <cimport'SetAudioStreamBufferSizeDefault', cinclude'<raylib.h>',nodecl> end
 
 global rl.PI: float32 <comptime> = 3.14159265358979323846
