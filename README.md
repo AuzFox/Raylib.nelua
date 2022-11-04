@@ -72,11 +72,14 @@ rl.closeWindow()       -- Close window and OpenGL context
 
 Further plans to incorporate easings.h raymath.h and raygui.h is planned to bring a complete Raylib experience to Nelua.
 
-Contributions are more than welcome.
+There is a good chance that certain functions are missing; report them if you do!
+They will be included right away.
+
+Contributions are encouraged. 
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/gimbap/fork>)
+1. Fork it (<https://github.com/your-github-user/Raylib-Nelua/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
