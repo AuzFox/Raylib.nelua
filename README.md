@@ -12,7 +12,7 @@
 
 ## Covered APIs
 - [X] raylib.h
-- [0] raymath.h - Planned
+- [0] raymath.h - Work started | WIP
 - [0] easings.h - Planned
 - [0] raygui.h - Planned
 
@@ -84,6 +84,8 @@ Contributions are encouraged.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+If you plan to contribute please make sure you follow the same coding convention to match overall style of this binding (camelCases)
 
 ## Contributors
 
