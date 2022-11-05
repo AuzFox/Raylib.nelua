@@ -1,3 +1,4 @@
+require 'math'
 ##[[
 cinclude "raylib.h"
 if ccinfo.is_emscripten then
@@ -37,7 +38,7 @@ else
 end
 ]]
 
-
+-- Raylib binding
 global rl = @record{}
 
 ------------------------------------------------------------------------------------
@@ -46,6 +47,18 @@ global rl = @record{}
 
 -- vector2, 2 components
 global rl.vector2: type <cimport'Vector2', cinclude'<raylib.h>',nodecl> = @record{
+    x: float32,                                             -- Vector x component
+    y: float32                                              -- Vector y component
+}
+
+## rl.value.metafields.vector2.value.is_vector2 = true
+local rl.vector2_or_scalar_concept = #[concept(function(attr)
+    -- match in case of scalar or Vec2
+    return attr.type.is_scalar or attr.type.is_vector2
+end)]#
+
+
+global vector2: type <cimport'Vector2', cinclude'<raylib.h>',nodecl> = @record{
     x: float32,                                             -- Vector x component
     y: float32                                              -- Vector y component
 }
@@ -1394,3 +1407,65 @@ global rl.BLACK: rl.color <cimport, nodecl,const>
 global rl.BLANK: rl.color <cimport, nodecl,const>
 global rl.MAGENTA: rl.color <cimport, nodecl,const>
 global rl.RAYWHITE: rl.color <cimport, nodecl,const>
+
+-- NOTE: Helper types to be used instead of array return types for *ToFloat functions
+global float3 <cimport, cinclude'<raymath.h>', nodecl> = @record{
+    v : [3]float32,
+}
+
+global float16 <cimport, cinclude'<raymath.h>', nodecl> = @record{
+    v : [16]float32,
+}
+  
+  -- ----------------------------------------------------------------------------------
+  -- Module Functions Definition - Utils math
+  -- ----------------------------------------------------------------------------------
+
+-- Vector2 methods
+function rl.vector2:zero() -- Vector with components value 0
+    self.x = 0
+    self.y = 0
+end
+
+function rl.vector2:one() -- Vector with components value 1
+    self.x = 1
+    self.y = 1
+end
+
+function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept)
+    ## if val1.type.is_vector2 and val2.type.is_vector2 then
+        return (@rl.vector2){val1.x + val2.x, val1.y + val2.y}
+    ## elseif val1.type.is_vector2 then
+        return (@rl.vector2){val1.x + val2, val1.y + val2}
+    ## elseif val2.type.is_vector2 then
+        return (@rl.vector2){val1 + val2.x, val1 + val2.y}
+    ## end
+end
+
+function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept)
+    ## if val1.type.is_vector2 and val2.type.is_vector2 then
+        return (@rl.vector2){val1.x - val2.x, val1.y - val2.y}
+    ## elseif val1.type.is_vector2 then
+        return (@rl.vector2){val1.x - val2, val1.y - val2}
+    ## elseif val2.type.is_vector2 then
+        return (@rl.vector2){val1 - val2.x, val1 - val2.y}
+    ## end
+end
+
+function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept)
+    ## if val1.type.is_vector2 and val2.type.is_vector2 then
+        return (@rl.vector2){val1.x * val2.x, val1.y * val2.y}
+    ## elseif val1.type.is_vector2 then
+        return (@rl.vector2){val1.x * val2, val1.y * val2}
+    ## elseif val2.type.is_vector2 then
+        return (@rl.vector2){val1 * val2.x, val1 * val2.y}
+    ## end
+end
+
+function rl.vector2:__len()
+    return math.sqrt((self.x*self.x) + (self.y*self.y))
+end
+
+function rl.vector2:lengthSqrt()
+    return (self.x * self.x) + (self.y * self.y)
+end
