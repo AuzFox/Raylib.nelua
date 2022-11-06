@@ -1422,17 +1422,17 @@ global float16 <cimport, cinclude'<raymath.h>', nodecl> = @record{
   -- ----------------------------------------------------------------------------------
 
 -- Vector2 methods
-function rl.vector2:zero() -- Vector with components value 0
+function rl.vector2:zero() <inline> -- Vector with components value 0
     self.x = 0
     self.y = 0
 end
 
-function rl.vector2:one() -- Vector with components value 1
+function rl.vector2:one() <inline> -- Vector with components value 1
     self.x = 1
     self.y = 1
 end
 
-function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept)
+function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
     ## if val1.type.is_vector2 and val2.type.is_vector2 then
         return (@rl.vector2){val1.x + val2.x, val1.y + val2.y}
     ## elseif val1.type.is_vector2 then
@@ -1442,7 +1442,7 @@ function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept)
+function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
     ## if val1.type.is_vector2 and val2.type.is_vector2 then
         return (@rl.vector2){val1.x - val2.x, val1.y - val2.y}
     ## elseif val1.type.is_vector2 then
@@ -1452,7 +1452,7 @@ function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept)
+function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
     ## if val1.type.is_vector2 and val2.type.is_vector2 then
         return (@rl.vector2){val1.x * val2.x, val1.y * val2.y}
     ## elseif val1.type.is_vector2 then
@@ -1462,10 +1462,22 @@ function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2:__len()
+function rl.vector2:__len() <inline> 
     return math.sqrt((self.x*self.x) + (self.y*self.y))
 end
 
-function rl.vector2:lengthSqrt()
+function rl.vector2:lengthSqrt() <inline> 
     return (self.x * self.x) + (self.y * self.y)
+end
+
+function rl.vector2:dotProduct(v2: rl.vector2) <inline> 
+    return (self.x*v2.x + self.y*v2.y)
+end
+
+function rl.vector2:distance(v2: rl.vector2) <inline> 
+    return math.sqrt((self.x - v2.x)*(self.x - v2.x) + (self.y - v2.y)*(self.y - v2.y))
+end
+
+function rl.vector2:distanceSqrt(v2: rl.vector2) <inline> 
+    return math.sqrt((self.x - v2.x)*(self.x - v2.x) + (self.x - v2.y)*(self.x - v2.y))
 end
