@@ -1421,16 +1421,24 @@ global float16 <cimport, cinclude'<raymath.h>', nodecl> = @record{
   -- Module Functions Definition - Utils math
   -- ----------------------------------------------------------------------------------
 
+function rl.clamp(value: float32, min: float32, max: float32): float32 <cimport'Clamp', cinclude'<raymath.h>',nodecl> end
+function rl.lerp(start: float32, _end: float32, amount: float32): float32 <cimport'Lerp', cinclude'<raymath.h>',nodecl> end
+function rl.normalise(value: float32, start: float32, _end: float32): float32 <cimport'Normalize', cinclude'<raymath.h>',nodecl> end
+function rl.remap(value: float32, inputStart: float32, inputEnd: float32, outputStart: float32, outputEnd: float32): float32 <cimport'Remap', cinclude'<raymath.h>',nodecl> end
+function rl.wrap(value: float32, min: float32, max: float32): float32 <cimport'Wrap', cinclude'<raymath.h>',nodecl> end
+function rl.floatEquals(x: float32, y: float32): cint <cimport'FloatEquals', cinclude'<raymath.h>',nodecl> end
+
 -- Vector2 methods
-function rl.vector2:zero() <inline> -- Vector with components value 0
+function rl.vector2:setZero() <inline> -- Vector with components value 0
     self.x = 0
     self.y = 0
 end
 
-function rl.vector2:one() <inline> -- Vector with components value 1
+function rl.vector2:setOne() <inline> -- Vector with components value 1
     self.x = 1
     self.y = 1
 end
+
 
 function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
     ## if val1.type.is_vector2 and val2.type.is_vector2 then
@@ -1452,21 +1460,12 @@ function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
-    ## if val1.type.is_vector2 and val2.type.is_vector2 then
-        return (@rl.vector2){val1.x * val2.x, val1.y * val2.y}
-    ## elseif val1.type.is_vector2 then
-        return (@rl.vector2){val1.x * val2, val1.y * val2}
-    ## elseif val2.type.is_vector2 then
-        return (@rl.vector2){val1 * val2.x, val1 * val2.y}
-    ## end
-end
 
 function rl.vector2:__len() <inline> 
     return math.sqrt((self.x*self.x) + (self.y*self.y))
 end
 
-function rl.vector2:lengthSqrt() <inline> 
+function rl.vector2:lengthSqr() <inline> 
     return (self.x * self.x) + (self.y * self.y)
 end
 
@@ -1478,6 +1477,60 @@ function rl.vector2:distance(v2: rl.vector2) <inline>
     return math.sqrt((self.x - v2.x)*(self.x - v2.x) + (self.y - v2.y)*(self.y - v2.y))
 end
 
-function rl.vector2:distanceSqrt(v2: rl.vector2) <inline> 
+function rl.vector2:distanceSqr(v2: rl.vector2) <inline> 
     return math.sqrt((self.x - v2.x)*(self.x - v2.x) + (self.x - v2.y)*(self.x - v2.y))
 end
+
+function rl.vector2:angle(v2: rl.vector2) <inline> 
+    return math.atan2(v2.y, v2.x) - math.atan2(self.y, self.x)
+end
+
+function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
+    ## if val1.type.is_vector2 and val2.type.is_vector2 then
+        return (@rl.vector2){val1.x * val2.x, val1.y * val2.y}
+    ## elseif val1.type.is_vector2 then
+        return (@rl.vector2){val1.x * val2, val1.y * val2}
+    ## elseif val2.type.is_vector2 then
+        return (@rl.vector2){val1 * val2.x, val1 * val2.y}
+    ## end
+end
+
+function rl.vector2:__unm()
+    return (@rl.vector2){-self.x, -self.y}
+end
+
+function rl.vector2.__div(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline> 
+    ## if val1.type.is_vector2 and val2.type.is_vector2 then
+        return (@rl.vector2){val1.x / val2.x, val1.y / val2.y}
+    ## elseif val1.type.is_vector2 then
+        return (@rl.vector2){val1.x / val2, val1.y / val2}
+    ## elseif val2.type.is_vector2 then
+        return (@rl.vector2){val1 / val2.x, val1 / val2.y}
+    ## end
+end
+
+function rl.vector2:normalise()
+    local result: rl.vector2 = {}
+    local length: float32 = math.sqrt((self.x*self.x) + (self.y*self.y))
+
+    if length > 0 then
+        local ilength = 1.0/length
+        result.x = self.x*ilength
+        result.y = self.y*ilength
+    end
+
+    return result
+end
+
+function rl.vector2:transform(mat: rl.matrix)
+    local result: rl.vector2 = {}
+    local x: float32 = self.x
+    local y: float32 = self.y
+    local z: float32 = 0
+
+    result.x = mat.m0*x + mat.m4*y + mat.m8*z + mat.m12
+    result.y = mat.m1*x + mat.m5*y + mat.m9*z + mat.m13
+
+    return result
+end
+
