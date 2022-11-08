@@ -57,18 +57,19 @@ local rl.vector2_or_scalar_concept = #[concept(function(attr)
     return attr.type.is_scalar or attr.type.is_vector2
 end)]#
 
-
-global vector2: type <cimport'Vector2', cinclude'<raylib.h>',nodecl> = @record{
-    x: float32,                                             -- Vector x component
-    y: float32                                              -- Vector y component
-}
-
 -- vector3, 3 components
 global rl.vector3: type <cimport'Vector3', cinclude'<raylib.h>',nodecl> = @record{
     x: float32,                                             -- Vector x component
     y: float32,                                             -- Vector y component
     z: float32                                              -- Vector z component
 }
+
+## rl.value.metafields.vector3.value.is_vector3 = true
+local rl.vector3_or_scalar_concept = #[concept(function(attr)
+    -- match in case of scalar or Vec3
+    return attr.type.is_scalar or attr.type.is_vector3
+end)]#
+
 
 -- vector4, 4 components
 global rl.vector4: type <cimport'Vector4', cinclude'<raylib.h>',nodecl> = @record{
@@ -1430,7 +1431,10 @@ function rl.remap(value: float32, inputStart: float32, inputEnd: float32, output
 function rl.wrap(value: float32, min: float32, max: float32): float32 <cimport'Wrap', cinclude'<raymath.h>',nodecl> end
 function rl.floatEquals(x: float32, y: float32): cint <cimport'FloatEquals', cinclude'<raymath.h>',nodecl> end
 
--- Vector2 methods
+-- ----------------------------------------------------------------------------------
+-- Module Functions Definition - Vector2 math
+-- ----------------------------------------------------------------------------------
+
 function rl.vector2:setZero() <inline> -- Vector with components value 0
     self.x = 0
     self.y = 0
@@ -1521,7 +1525,8 @@ function rl.vector2:normalise() <inline>
         result.y = self.y*ilength
     end
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:transform(mat: rl.matrix) <inline> 
@@ -1533,7 +1538,8 @@ function rl.vector2:transform(mat: rl.matrix) <inline>
     result.x = mat.m0*x + mat.m4*y + mat.m8*z + mat.m12
     result.y = mat.m1*x + mat.m5*y + mat.m9*z + mat.m13
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:lerp(v2: rl.vector2, amount: float32) <inline> 
@@ -1542,7 +1548,8 @@ function rl.vector2:lerp(v2: rl.vector2, amount: float32) <inline>
     result.x = self.x + amount * (v2.x - self.x)
     result.y = self.y + amount * (v2.y - self.y)
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:reflect(normal: rl.vector2) <inline> 
@@ -1553,11 +1560,12 @@ function rl.vector2:reflect(normal: rl.vector2) <inline>
     result.x = self.x - (2.0*normal.x)*dotProduct
     result.y = self.y - (2.0*normal.y)*dotProduct
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:rotate(angle: float32) <inline> 
-    local result = {}
+    local result: rl.vector2 = {}
 
     local cosres = math.cos(angle)
     local sinres = math.sin(angle)
@@ -1565,7 +1573,8 @@ function rl.vector2:rotate(angle: float32) <inline>
     result.x = self.x*cosres - self.y*sinres
     result.y = self.x*sinres + self.y*cosres
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:moveTowards(target: rl.vector2, maxDistance: float32) <inline> 
@@ -1582,12 +1591,17 @@ function rl.vector2:moveTowards(target: rl.vector2, maxDistance: float32) <inlin
     result.x = self.x + dx/dist*maxDistance
     result.y = self.y + dy/dist*maxDistance
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:invert() <inline> 
     return (@rl.vector2){1.0/self.x, 1.0/self.y}
 end
+-- ----------------------------------------------------------------------------------
+-- Module Functions Definition - Vector 2 math
+-- ----------------------------------------------------------------------------------
+
 
 function rl.vector2:clamp(min: rl.vector2, max: rl.vector2) <inline> 
     local result: rl.vector2 = {}
@@ -1595,7 +1609,8 @@ function rl.vector2:clamp(min: rl.vector2, max: rl.vector2) <inline>
     result.x = math.min(max.x, math.max(min.x, self.x))
     result.y = math.min(max.y, math.max(min.y, self.y))
 
-    return result
+    $self = result
+    return self
 end
 
 function rl.vector2:clampValue(min: float32, max: float32) <inline> 
@@ -1616,4 +1631,130 @@ function rl.vector2:clampValue(min: float32, max: float32) <inline>
             result.y = self.y*scale
         end
     end
+end
+
+function rl.vector2:__eq(v2: rl.vector2)
+    return self.x == v2.x and self.y == v2.y
+end
+
+
+-- ----------------------------------------------------------------------------------
+-- Module Functions Definition - Vector3 math
+-- ----------------------------------------------------------------------------------
+
+function rl.vector3:setZero() <inline> -- Vector with components value 0
+    self.x = 0
+    self.y = 0
+    self.z = 0
+end
+
+function rl.vector3:setOne() <inline> -- Vector with components value 1
+    self.x = 1
+    self.y = 1
+    self.z = 1
+end
+
+
+function rl.vector3.__add(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept) <inline> 
+    ## if val1.type.is_vector3 and val2.type.is_vector3 then
+        return (@rl.vector3){val1.x + val2.x, val1.y + val2.y, val1.z + val2.z}
+    ## elseif val1.type.is_vector3 then
+        return (@rl.vector3){val1.x + val2, val1.y + val2, val1.z + val2}
+    ## elseif val2.type.is_vector3 then
+        return (@rl.vector3){val1 + val2.x, val1 + val2.y, val1 + val2.z}
+    ## end
+end
+
+function rl.vector3.__sub(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept) <inline> 
+    ## if val1.type.is_vector3 and val2.type.is_vector3 then
+        return (@rl.vector3){val1.x - val2.x, val1.y - val2.y, val1.z - val2.z}
+    ## elseif val1.type.is_vector3 then
+        return (@rl.vector3){val1.x - val2, val1.y - val2, val1.z - val2}
+    ## elseif val2.type.is_vector3 then
+        return (@rl.vector3){val1 - val2.x, val1 - val2.y, val1 - val2.z}
+    ## end
+end
+
+function rl.vector3.__mul(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept) <inline> 
+    ## if val1.type.is_vector3 and val2.type.is_vector3 then
+        return (@rl.vector3){val1.x * val2.x, val1.y * val2.y, val1.z * val2.z}
+    ## elseif val1.type.is_vector2 then
+        return (@rl.vector3){val1.x * val2, val1.y * val2, val1.z * val2}
+    ## elseif val2.type.is_vector2 then
+        return (@rl.vector3){val1 * val2.x, val1 * val2.y, val1 * val2.z}
+    ## end
+end
+
+function rl.vector3:crossProduct(v2: rl.vector3) <inline> 
+    $self = {self.y*v2.z - self.z*v2.y, self.z*v2.x - self.x*v2.z, self.x*v2.y - self.y*v2.x}
+    return self
+end
+
+function rl.vector3:perpendicular() <inline> 
+
+    local min: float32 = math.abs(self.x)
+    local cardinalAxis: rl.vector3 = {1.0, 0.0, 0.0}
+
+    if math.abs(self.y) < min then
+        min = math.abs(self.y);
+        local tmp: rl.vector3 = {0.0, 1.0, 0.0}
+        cardinalAxis = tmp
+    end
+
+    if math.abs(self.z) < min then
+        local tmp: rl.vector3 = {0.0, 0.0, 1.0}
+        cardinalAxis = tmp
+    end
+
+    -- Cross product between vectors
+    self.x = self.y*cardinalAxis.z - self.z*cardinalAxis.y
+    self.y = self.z*cardinalAxis.x - self.x*cardinalAxis.z
+    self.z = self.x*cardinalAxis.y - self.y*cardinalAxis.x
+
+    return self
+end
+
+function rl.vector3:__len() <inline> 
+    return math.sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+end
+
+function rl.vector3:lengthSqr() <inline> 
+    return self.x*self.x + self.y*self.y + self.z*self.z
+end
+
+function rl.vector3:dotProduct(v2: rl.vector3) <inline> 
+    return (self.x*v2.x + self.y*v2.y + self.z+v2.z)
+end
+
+function rl.vector3:distance(v2: rl.vector3) <inline> 
+    local result: float32 = 0.0
+
+    local dx = v2.x - self.x
+    local dy = v2.y - self.y
+    local dz = v2.z - self.z
+
+    result = math.sqrt(dx*dx + dy*dy + dz*dz)
+    return result
+end
+
+function rl.vector3:distanceSqr(v2: rl.vector3) <inline> 
+    local result: float32 = 0.0
+
+    local dx = v2.x - self.x
+    local dy = v2.y - self.y
+    local dz = v2.z - self.z
+
+    result = dx*dx + dy*dy + dz*dz
+    return result
+end
+
+function rl.vector3:angle(v2: rl.vector3) <inline> 
+    local result: float32 = 0.0
+
+    local cross: rl.vector3 = { self.y*v2.z - self.z*v2.y, self.z*v2.x - self.x*v2.z, self.x*v2.y - self.y*v2.x }
+    local len: float32 = math.sqrt(cross.x*cross.x + cross.y*cross.y + cross.z*cross.z)
+    local dot: float32 = (self.x*v2.x + self.y*v2.y + self.z*v2.z)
+    result = math.atan2(len, dot)
+
+    return result
 end
