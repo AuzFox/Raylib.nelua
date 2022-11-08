@@ -1416,10 +1416,12 @@ global float3 <cimport, cinclude'<raymath.h>', nodecl> = @record{
 global float16 <cimport, cinclude'<raymath.h>', nodecl> = @record{
     v : [16]float32,
 }
+
+global rl.EPSILON: float32 <cimport'EPSILON', cinclude'<raymath.h>',nodecl,const>
   
-  -- ----------------------------------------------------------------------------------
-  -- Module Functions Definition - Utils math
-  -- ----------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------
+-- Module Functions Definition - Utils math
+-- ----------------------------------------------------------------------------------
 
 function rl.clamp(value: float32, min: float32, max: float32): float32 <cimport'Clamp', cinclude'<raymath.h>',nodecl> end
 function rl.lerp(start: float32, _end: float32, amount: float32): float32 <cimport'Lerp', cinclude'<raymath.h>',nodecl> end
@@ -1495,7 +1497,7 @@ function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2:__unm()
+function rl.vector2:__unm() <inline> 
     return (@rl.vector2){-self.x, -self.y}
 end
 
@@ -1509,7 +1511,7 @@ function rl.vector2.__div(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2:normalise()
+function rl.vector2:normalise() <inline> 
     local result: rl.vector2 = {}
     local length: float32 = math.sqrt((self.x*self.x) + (self.y*self.y))
 
@@ -1522,7 +1524,7 @@ function rl.vector2:normalise()
     return result
 end
 
-function rl.vector2:transform(mat: rl.matrix)
+function rl.vector2:transform(mat: rl.matrix) <inline> 
     local result: rl.vector2 = {}
     local x: float32 = self.x
     local y: float32 = self.y
@@ -1534,3 +1536,84 @@ function rl.vector2:transform(mat: rl.matrix)
     return result
 end
 
+function rl.vector2:lerp(v2: rl.vector2, amount: float32) <inline> 
+    local result: rl.vector2 = {}
+    
+    result.x = self.x + amount * (v2.x - self.x)
+    result.y = self.y + amount * (v2.y - self.y)
+
+    return result
+end
+
+function rl.vector2:reflect(normal: rl.vector2) <inline> 
+    local result: rl.vector2 = {}
+
+    local dotProduct: float32 = (self.x*normal.x + self.y*normal.y)
+
+    result.x = self.x - (2.0*normal.x)*dotProduct
+    result.y = self.y - (2.0*normal.y)*dotProduct
+
+    return result
+end
+
+function rl.vector2:rotate(angle: float32) <inline> 
+    local result = {}
+
+    local cosres = math.cos(angle)
+    local sinres = math.sin(angle)
+
+    result.x = self.x*cosres - self.y*sinres
+    result.y = self.x*sinres + self.y*cosres
+
+    return result
+end
+
+function rl.vector2:moveTowards(target: rl.vector2, maxDistance: float32) <inline> 
+    local result: rl.vector2 = {}
+
+    local dx: float32 = target.x - self.x
+    local dy: float32 = target.y - self.y
+    local value: float32 = (dx*dx) + (dy*dy)
+
+    if ((value == 0) or ((maxDistance >= 0) and (value <= maxDistance*maxDistance))) then return target end
+
+    local dist: float32 = math.sqrt(value)
+
+    result.x = self.x + dx/dist*maxDistance
+    result.y = self.y + dy/dist*maxDistance
+
+    return result
+end
+
+function rl.vector2:invert() <inline> 
+    return (@rl.vector2){1.0/self.x, 1.0/self.y}
+end
+
+function rl.vector2:clamp(min: rl.vector2, max: rl.vector2) <inline> 
+    local result: rl.vector2 = {}
+
+    result.x = math.min(max.x, math.max(min.x, self.x))
+    result.y = math.min(max.y, math.max(min.y, self.y))
+
+    return result
+end
+
+function rl.vector2:clampValue(min: float32, max: float32) <inline> 
+    local result = self
+    local length: float32 = (self.x*self.x) + (self.y*self.y)
+
+    if (length > 0.0) then
+        length = math.sqrt(length)
+
+        if (length < min) then
+        
+            local scale: float32 = min/length
+            result.x = self.x*scale
+            result.y = self.y*scale
+        elseif (length > max) then
+            local scale: float32 = max/length
+            result.x = self.x*scale
+            result.y = self.y*scale
+        end
+    end
+end
