@@ -1758,3 +1758,81 @@ function rl.vector3:angle(v2: rl.vector3) <inline>
 
     return result
 end
+
+function rl.vector3:__unm() <inline> 
+    return (@rl.vector3){-self.x, -self.y, -self.z}
+end
+
+function rl.vector3.__div(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept) <inline> 
+    ## if val1.type.is_vector3 and val2.type.is_vector3 then
+        return (@rl.vector3){val1.x / val2.x, val1.y / val2.y, val1.z / val2.z}
+    ## elseif val1.type.is_vector3 then
+        return (@rl.vector3){val1.x / val2, val1.y / val2, val1.z / val2}
+    ## elseif val2.type.is_vector3 then
+        return (@rl.vector3){val1 / val2.x, val1 / val2.y, val1 / val2.z}
+    ## end
+end
+
+function rl.vector3:normalise() <inline> 
+    local result = (@rl.vector3){self.x, self.y, self.z}
+
+    local length: float32 = math.sqrt(self.x*self.x + self.y*self.y + self.z*self.z);
+    if length == 0.0 then length = 1.0 end
+    local ilength: float32 = 1.0/length
+
+    result.x = result.x * ilength
+    result.y = result.y * ilength
+    result.z = result.z * ilength
+
+    $self = result
+    return self
+end
+
+function rl.vector3:orthoNormalise(v2: *rl.vector3) <inline>
+    local length: float32 = 0.0
+    local ilength: float32 = 0.0
+
+    local v = $self
+    length = math.sqrt(self.x*self.x + self.y*self.y + self.z+self.z)
+    if length == 0.0 then length = 1.0 end
+    ilength = 1.0/length
+    self.x = self.x * ilength
+    self.y = self.y * ilength
+    self.z = self.z * ilength
+
+    local vn1: rl.vector3 = { self.y*v2.z - self.z*v2.y, self.z*v2.x - self.x*v2.z, self.x*v2.y - self.y*v2.x }
+
+    v = vn1
+    length = math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
+    if length == 0.0 then length = 1.0 end
+    ilength = 1.0/length
+    vn1.x = vn1.x * ilength
+    vn1.y = vn1.y * ilength
+    vn1.z = vn1.z * ilength
+
+    local vn2: rl.vector3 = { vn1.y*self.z - vn1.z*self.y, vn1.z*self.x - vn1.x*self.z, vn1.x*self.y - vn1.y*self.x };
+
+    $v2 = vn2
+end
+
+function rl.vector3.transform(self: rl.vector3, mat: rl.matrix) <inline> 
+    local result: rl.vector2 = {}
+    local x: float32 = self.x
+    local y: float32 = self.y
+    local z: float32 = 0
+
+    result.x = mat.m0*x + mat.m4*y + mat.m8*z + mat.m12
+    result.y = mat.m1*x + mat.m5*y + mat.m9*z + mat.m13
+
+    return result
+end
+
+function rl.vector3.rotateByQuaternion(self: rl.vector3, q: rl.quaternion)
+    local result: rl.vector3 = {}
+
+    result.x = self.x*(q.x*q.x + q.w*q.w - q.y*q.y - q.z*q.z) + self.y*(2*q.x*q.y - 2*q.w*q.z) + self.z*(2*q.x*q.z + 2*q.w*q.y)
+    result.y = self.x*(2*q.w*q.z + 2*q.x*q.y) + self.y*(q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z) + self.z*(-2*q.w*q.x + 2*q.y*q.z)
+    result.z = self.x*(-2*q.w*q.y + 2*q.x*q.z) + self.y*(2*q.w*q.x + 2*q.y*q.z)+ self.z*(q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z)
+
+    return result
+end
