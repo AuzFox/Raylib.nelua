@@ -1410,11 +1410,11 @@ global rl.MAGENTA: rl.color <cimport, nodecl,const>
 global rl.RAYWHITE: rl.color <cimport, nodecl,const>
 
 -- NOTE: Helper types to be used instead of array return types for *ToFloat functions
-global float3 <cimport, cinclude'<raymath.h>', nodecl> = @record{
+global rl.float3 <cimport, cinclude'<raymath.h>', nodecl> = @record{
     v : [3]float32,
 }
 
-global float16 <cimport, cinclude'<raymath.h>', nodecl> = @record{
+global rl.float16 <cimport, cinclude'<raymath.h>', nodecl> = @record{
     v : [16]float32,
 }
 
@@ -1596,12 +1596,8 @@ function rl.vector2:moveTowards(target: rl.vector2, maxDistance: float32) <inlin
 end
 
 function rl.vector2:invert() <inline> 
-    return (@rl.vector2){1.0/self.x, 1.0/self.y}
+    $self = (@rl.vector2){1.0/self.x, 1.0/self.y}
 end
--- ----------------------------------------------------------------------------------
--- Module Functions Definition - Vector 2 math
--- ----------------------------------------------------------------------------------
-
 
 function rl.vector2:clamp(min: rl.vector2, max: rl.vector2) <inline> 
     local result: rl.vector2 = {}
@@ -1815,8 +1811,8 @@ function rl.vector3:orthoNormalise(v2: *rl.vector3) <inline>
     $v2 = vn2
 end
 
-function rl.vector3.transform(self: rl.vector3, mat: rl.matrix) <inline> 
-    local result: rl.vector2 = {}
+function rl.vector3:transform(mat: rl.matrix) <inline> 
+    local result: rl.vector3 = {}
     local x: float32 = self.x
     local y: float32 = self.y
     local z: float32 = 0
@@ -1824,15 +1820,294 @@ function rl.vector3.transform(self: rl.vector3, mat: rl.matrix) <inline>
     result.x = mat.m0*x + mat.m4*y + mat.m8*z + mat.m12
     result.y = mat.m1*x + mat.m5*y + mat.m9*z + mat.m13
 
-    return result
+    $self = result
+    return $self
 end
 
-function rl.vector3.rotateByQuaternion(self: rl.vector3, q: rl.quaternion)
+function rl.vector3:rotateByQuaternion(q: rl.quaternion) <inline> 
     local result: rl.vector3 = {}
 
     result.x = self.x*(q.x*q.x + q.w*q.w - q.y*q.y - q.z*q.z) + self.y*(2*q.x*q.y - 2*q.w*q.z) + self.z*(2*q.x*q.z + 2*q.w*q.y)
     result.y = self.x*(2*q.w*q.z + 2*q.x*q.y) + self.y*(q.w*q.w - q.x*q.x + q.y*q.y - q.z*q.z) + self.z*(-2*q.w*q.x + 2*q.y*q.z)
     result.z = self.x*(-2*q.w*q.y + 2*q.x*q.z) + self.y*(2*q.w*q.x + 2*q.y*q.z)+ self.z*(q.w*q.w - q.x*q.x - q.y*q.y + q.z*q.z)
 
+    $self = result
+    return $self
+end
+
+function rl.vector3:rotateByAxisAngle(axis: rl.vector3, angle: float32) <inline>
+    local result: rl.vector3 = $self
+
+    local length: float32 = math.sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z)
+    if length == 0.0 then length = 1.0 end
+    local ilength: float32 = 1.0 / length
+
+    axis.x = axis.x * ilength
+    axis.y = axis.y * ilength
+    axis.z = axis.z * ilength
+
+    angle = angle / 2.0
+
+    local a: float32 = math.sin(angle)
+    local b: float32 = axis.x * a
+    local c: float32 = axis.y * a
+    local d: float32 = axis.z * a
+    a = math.cos(angle)
+    local w: rl.vector3 = { b, c, d }
+    
+    local wv: rl.vector3 = { w.y * self.z - w.z * self.y, w.z * self.x - w.x * self.z, w.x * self.y - w.y * self.x }
+
+    local wwv: rl.vector3 = { w.y * wv.z - w.z * wv.y, w.z * wv.x - w.x * wv.z, w.x * wv.y - w.y * wv.x }
+
+    a = a * 2
+    wv.x = wv.x * a
+    wv.y = wv.y * a
+    wv.z = wv.z * a
+
+    wwv.x = wwv.x * 2
+    wwv.y = wwv.y * 2
+    wwv.z = wwv.z * 2
+
+    result.x = result.x + wv.x
+    result.y = result.y + wv.y
+    result.z = result.z + wv.z
+
+    result.x = result.x + wwv.x
+    result.y = result.y + wwv.y
+    result.z = result.z + wwv.z
+
+    $self = result
+    return $self
+end
+
+function rl.vector3:lerp(v2: rl.vector3, amount: float32) <inline> 
+    local result: rl.vector3 = {}
+    
+    result.x = self.x + amount * (v2.x - self.x)
+    result.y = self.y + amount * (v2.y - self.y)
+    result.y = self.z + amount * (v2.z - self.z)
+
+    $self = result
+    return self
+end
+
+function rl.vector3:reflect(normal: rl.vector3) <inline>
+    local result: rl.vector3 = {}
+
+    local dotProduct: float32 = (self.x*normal.x + self.y*normal.y + self.z*normal.z)
+
+    result.x = self.x - (2.0*normal.x)*dotProduct
+    result.y = self.y - (2.0*normal.y)*dotProduct
+    result.z = self.z - (2.0*normal.z)*dotProduct
+
+    $self = result
+    return self
+end
+
+function rl.vector3:min(v2: rl.vector3) <inline>
+    local result: rl.vector3 = {} 
+
+    result.x = math.min(self.x, v2.x)
+    result.y = math.min(self.y, v2.y)
+    result.z = math.min(self.z, v2.z)
+
+    $self = result
+    return self
+end
+
+function rl.vector3:max(v2: rl.vector3) <inline>
+    local result: rl.vector3 = {} 
+
+    result.x = math.max(self.x, v2.x)
+    result.y = math.max(self.y, v2.y)
+    result.z = math.max(self.z, v2.z)
+
+    $self = result
+    return self
+end
+
+function rl.vector3.barycenter(p: rl.vector3, a: rl.vector3, b: rl.vector3, c: rl.vector3): rl.vector3 <inline>
+    local result: rl.vector3 = { }
+
+    local v0: rl.vector3 = { b.x - a.x, b.y - a.y, b.z - a.z }
+    local v1: rl.vector3 = { c.x - a.x, c.y - a.y, c.z - a.z }
+    local v2: rl.vector3 = { p.x - a.x, p.y - a.y, p.z - a.z }
+    local d00: float32 = (v0.x*v0.x + v0.y*v0.y + v0.z*v0.z)
+    local d01: float32 = (v0.x*v1.x + v0.y*v1.y + v0.z*v1.z)
+    local d11: float32 = (v1.x*v1.x + v1.y*v1.y + v1.z*v1.z)
+    local d20: float32 = (v2.x*v0.x + v2.y*v0.y + v2.z*v0.z)
+    local d21: float32 = (v2.x*v1.x + v2.y*v1.y + v2.z*v1.z)
+
+    local denom: float32 = d00*d11 - d01*d01
+
+    result.y = (d11*d20 - d01*d21)/denom
+    result.z = (d00*d21 - d01*d20)/denom
+    result.x = 1.0 - (result.z + result.y)
+
     return result
 end
+
+function rl.vector3.unproject(source: rl.vector3, projection: rl.matrix, view: rl.matrix) <inline>
+    local result: rl.vector3 = {}
+
+    local matViewProj: rl.matrix = {   
+        view.m0*projection.m0 + view.m1*projection.m4 + view.m2*projection.m8 + view.m3*projection.m12,
+        view.m0*projection.m1 + view.m1*projection.m5 + view.m2*projection.m9 + view.m3*projection.m13,
+        view.m0*projection.m2 + view.m1*projection.m6 + view.m2*projection.m10 + view.m3*projection.m14,
+        view.m0*projection.m3 + view.m1*projection.m7 + view.m2*projection.m11 + view.m3*projection.m15,
+        view.m4*projection.m0 + view.m5*projection.m4 + view.m6*projection.m8 + view.m7*projection.m12,
+        view.m4*projection.m1 + view.m5*projection.m5 + view.m6*projection.m9 + view.m7*projection.m13,
+        view.m4*projection.m2 + view.m5*projection.m6 + view.m6*projection.m10 + view.m7*projection.m14,
+        view.m4*projection.m3 + view.m5*projection.m7 + view.m6*projection.m11 + view.m7*projection.m15,
+        view.m8*projection.m0 + view.m9*projection.m4 + view.m10*projection.m8 + view.m11*projection.m12,
+        view.m8*projection.m1 + view.m9*projection.m5 + view.m10*projection.m9 + view.m11*projection.m13,
+        view.m8*projection.m2 + view.m9*projection.m6 + view.m10*projection.m10 + view.m11*projection.m14,
+        view.m8*projection.m3 + view.m9*projection.m7 + view.m10*projection.m11 + view.m11*projection.m15,
+        view.m12*projection.m0 + view.m13*projection.m4 + view.m14*projection.m8 + view.m15*projection.m12,
+        view.m12*projection.m1 + view.m13*projection.m5 + view.m14*projection.m9 + view.m15*projection.m13,
+        view.m12*projection.m2 + view.m13*projection.m6 + view.m14*projection.m10 + view.m15*projection.m14,
+        view.m12*projection.m3 + view.m13*projection.m7 + view.m14*projection.m11 + view.m15*projection.m15 }
+
+    local a00: float32 = matViewProj.m0
+    local a01: float32 = matViewProj.m1
+    local a02: float32 = matViewProj.m2
+    local a03: float32 = matViewProj.m3
+    local a10: float32 = matViewProj.m4
+    local a11: float32 = matViewProj.m5
+    local a12: float32 = matViewProj.m6
+    local a13: float32 = matViewProj.m7
+    local a20: float32 = matViewProj.m8
+    local a21: float32 = matViewProj.m9
+    local a22: float32 = matViewProj.m10
+    local a23: float32 = matViewProj.m11
+    local a30: float32 = matViewProj.m12
+    local a31: float32 = matViewProj.m13
+    local a32: float32 = matViewProj.m14
+    local a33: float32 = matViewProj.m15
+
+    local b00: float32 = a00*a11 - a01*a10
+    local b01: float32 = a00*a12 - a02*a10
+    local b02: float32 = a00*a13 - a03*a10
+    local b03: float32 = a01*a12 - a02*a11
+    local b04: float32 = a01*a13 - a03*a11
+    local b05: float32 = a02*a13 - a03*a12
+    local b06: float32 = a20*a31 - a21*a30
+    local b07: float32 = a20*a32 - a22*a30
+    local b08: float32 = a20*a33 - a23*a30
+    local b09: float32 = a21*a32 - a22*a31
+    local b10: float32 = a21*a33 - a23*a31
+    local b11: float32 = a22*a33 - a23*a32
+
+    local invDet: float32 = 1.0/(b00*b11 - b01*b10 + b02*b09 + b03*b08 - b04*b07 + b05*b06)
+
+    local matViewProjInv: rl.matrix = {
+        (a11*b11 - a12*b10 + a13*b09)*invDet,
+        (-a01*b11 + a02*b10 - a03*b09)*invDet,
+        (a31*b05 - a32*b04 + a33*b03)*invDet,
+        (-a21*b05 + a22*b04 - a23*b03)*invDet,
+        (-a10*b11 + a12*b08 - a13*b07)*invDet,
+        (a00*b11 - a02*b08 + a03*b07)*invDet,
+        (-a30*b05 + a32*b02 - a33*b01)*invDet,
+        (a20*b05 - a22*b02 + a23*b01)*invDet,
+        (a10*b10 - a11*b08 + a13*b06)*invDet,
+        (-a00*b10 + a01*b08 - a03*b06)*invDet,
+        (a30*b04 - a31*b02 + a33*b00)*invDet,
+        (-a20*b04 + a21*b02 - a23*b00)*invDet,
+        (-a10*b09 + a11*b07 - a12*b06)*invDet,
+        (a00*b09 - a01*b07 + a02*b06)*invDet,
+        (-a30*b03 + a31*b01 - a32*b00)*invDet,
+        (a20*b03 - a21*b01 + a22*b00)*invDet }
+
+        local quat: rl.quaternion = { source.x, source.y, source.z, 1.0 }
+
+        local qtransformed: rl.quaternion = {
+        matViewProjInv.m0*quat.x + matViewProjInv.m4*quat.y + matViewProjInv.m8*quat.z + matViewProjInv.m12*quat.w,
+        matViewProjInv.m1*quat.x + matViewProjInv.m5*quat.y + matViewProjInv.m9*quat.z + matViewProjInv.m13*quat.w,
+        matViewProjInv.m2*quat.x + matViewProjInv.m6*quat.y + matViewProjInv.m10*quat.z + matViewProjInv.m14*quat.w,
+        matViewProjInv.m3*quat.x + matViewProjInv.m7*quat.y + matViewProjInv.m11*quat.z + matViewProjInv.m15*quat.w }
+
+    result.x = qtransformed.x/qtransformed.w
+    result.y = qtransformed.y/qtransformed.w
+    result.z = qtransformed.z/qtransformed.w
+
+    return result
+end
+
+function rl.vector3:toFloatV() <inline>
+    local buffer: rl.float3 = {}
+
+    buffer.v[0] = self.x
+    buffer.v[1] = self.y
+    buffer.v[2] = self.z
+
+    return buffer
+end
+
+function rl.vector3:invert() <inline>
+    local result: rl.vector3 = { 1.0/self.x, 1.0/self.y, 1.0/self.z }
+    
+    $self = result
+    return self
+end
+
+function rl.vector3:clamp(min: rl.vector3, max: rl.vector3) <inline>
+    local result: rl.vector3 = { }
+
+    result.x = math.min(max.x, math.max(min.x, self.x))
+    result.y = math.min(max.y, math.max(min.y, self.y))
+    result.z = math.min(max.z, math.max(min.z, self.z))
+
+    $self = result
+    return self
+end
+
+function rl.vector3:clampValue(min: float32, max: float32) <inline>
+    local result: rl.vector3 = $self
+
+    local length: float32 = (self.x*self.x) + (self.y*self.y) + (self.z*self.z)
+    if (length > 0.0) then
+        length = math.sqrt(length)
+
+        if (length < min) then
+
+            local scale: float32 = min/length
+            result.x = self.x*scale
+            result.y = self.y*scale
+            result.z = self.z*scale
+        elseif (length > max) then
+            local scale: float32 = max/length
+            result.x = self.x*scale
+            result.y = self.y*scale
+            result.z = self.z*scale
+        end
+    end
+
+    $self = result
+    return self
+end
+
+function rl.vector3:__eq(v2: rl.vector3) <inline>
+    return self.x == v2.x and self.y == v2.y and self.z == v2.z
+end
+
+function rl.vector3:refract(n: rl.vector3, r: float32) <inline>
+    local result: rl.vector3 = {}
+
+    local dot: float32 = self.x*n.x + self.y*n.y + self.z*n.z
+    local d: float32 = 1.0 - r*r*(1.0 - dot*dot)
+
+    if (d >= 0.0) then
+        d = math.sqrt(d)
+        self.x = r*self.x - (r*dot + d)*n.x
+        self.y = r*self.y - (r*dot + d)*n.y
+        self.z = r*self.z - (r*dot + d)*n.z
+
+        result = $self
+    end
+
+    return result
+end
+
+-- ----------------------------------------------------------------------------------
+-- Module Functions Definition - Matrix 2 math
+-- ----------------------------------------------------------------------------------
