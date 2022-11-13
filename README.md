@@ -11,8 +11,8 @@
 - Web? (Has not been tested yet.)
 
 ## Covered APIs
-- [X] raylib.h
-- [0] raymath.h - Work started | WIP
+- [X] raylib.h - Finished
+- [X] raymath.h - Finished, Vector2 and Vector3 math are all using methods, matrix and quaternions use functions!
 - [0] easings.h - Planned
 - [0] raygui.h - Planned
 
