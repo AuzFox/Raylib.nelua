@@ -2137,3 +2137,26 @@ function rl.matrix.toFloatV(mat: rl.matrix): rl.matrix <cimport'MatrixToFloatV',
 -- ----------------------------------------------------------------------------------
 -- Module Functions Definition - Quaternion math
 -- ----------------------------------------------------------------------------------
+function rl.quaternion.add(q1: rl.quaternion, q2: rl.quaternion): rl.quaternion <cimport'QuaternionAdd', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.addValue(q1: rl.quaternion, add: float32): rl.quaternion <cimport'QuaternionAddValue', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.subtract(q1: rl.quaternion, q2: rl.quaternion): rl.quaternion <cimport'QuaternionSubtract', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.subtractValue(q1: rl.quaternion, sub: float32): rl.quaternion <cimport'QuaternionSubtractValue', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.identity(): rl.quaternion <cimport'QuaternionIdentity', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.length(q: rl.quaternion): float32  <cimport'QuaternionLength', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.normalise(q: rl.quaternion): rl.quaternion <cimport'QuaternionNormalize', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.invert(q: rl.quaternion): rl.quaternion <cimport'QuaternionInvert', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.multiply(): rl.quaternion <cimport'QuaternionMultiply', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.scale(q: rl.quaternion, mul: float32): rl.quaternion <cimport'QuaternionScale', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.divide(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionDivide', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.lerp(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionLerp', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.nLerp(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionNlerp', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.sLerp(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionSlerp', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.fromVector3ToVector3(from: rl.vector3, to: rl.vector3): rl.quaternion <cimport'QuaternionFromVector3ToVector3', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.fromMatrix(mat: rl.matrix): rl.quaternion <cimport'QuaternionFromMatrix', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.toMatrix(q: rl.quaternion): rl.matrix <cimport'QuaternionToMatrix', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.fromAxisAngle(axis: rl.vector3, angle: float32): rl.quaternion <cimport'QuaternionFromAxisAngle', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.toAxisAngle(q: rl.quaternion, outAxis: *rl.vector3, outAngle: *float32)  <cimport'QuaternionToAxisAngle', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.fromEuler(pitch: float32, yaw: float32, roll: float32): rl.quaternion <cimport'QuaternionFromEuler', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.toEuler(q: rl.quaternion): rl.vector3 <cimport'QuaternionToEuler', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.transform(q: rl.quaternion, mat: rl.matrix): rl.quaternion <cimport'QuaternionTransform', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.equals(p: rl.quaternion, q: rl.quaternion): boolean <cimport'QuaternionEquals', cinclude'<raymath.h>',nodecl> end
