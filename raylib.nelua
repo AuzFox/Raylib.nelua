@@ -2109,5 +2109,31 @@ function rl.vector3:refract(n: rl.vector3, r: float32) <inline>
 end
 
 -- ----------------------------------------------------------------------------------
--- Module Functions Definition - Matrix 2 math
+-- Module Functions Definition - Matrix math
+-- ----------------------------------------------------------------------------------
+
+function rl.matrix.determinant(mat: rl.matrix): float32 <cimport'MatrixDeterminant', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.trace(mat: rl.matrix): float32 <cimport'MatrixTrace', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.transpose(mat: rl.matrix): rl.matrix <cimport'MatrixTranspose', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.invert(mat: rl.matrix): rl.matrix <cimport'MatrixInvert', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.identity(): rl.matrix <cimport'MatrixIdentity', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.subtract(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.multiply(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.translate(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixTranslate', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.rotate(axis: rl.vector3, angle: float32): rl.matrix <cimport'MatrixRotate', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.rotateX(angle: float32): rl.matrix <cimport'MatrixRotateX', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.rotateY(angle: float32): rl.matrix <cimport'MatrixRotateY', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.rotateZ(angle: float32): rl.matrix <cimport'MatrixRotateZ', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.rotateXYZ(angle: rl.vector3): rl.matrix <cimport'MatrixRotateXYZ', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.rotateZYX(angle: rl.vector3): rl.matrix <cimport'MatrixRotateZYX', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.scale(x: float32, y: float32, z: float32): rl.matrix <cimport'MatrixScale', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): rl.matrix <cimport'MatrixFrustum', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.perspective(fovy: number, aspect: number, near: number, far: number): rl.matrix <cimport'MatrixPerspective', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): rl.matrix <cimport'MatrixOrtho', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.lookAt(eye: rl.vector3, target: rl.vector3, up: rl.vector3): rl.matrix <cimport'MatrixLookAt', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.toFloatV(mat: rl.matrix): rl.matrix <cimport'MatrixToFloatV', cinclude'<raymath.h>',nodecl> end
+
+-- ----------------------------------------------------------------------------------
+-- Module Functions Definition - Quaternion math
 -- ----------------------------------------------------------------------------------
