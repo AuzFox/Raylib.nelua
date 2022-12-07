@@ -65,7 +65,7 @@ rl.closeWindow()       -- Close window and OpenGL context
 
 ## Usage
 
-**1.** Run the code by passing a C Flag to the C Compiler (path to raylib.nelua) `nelua main.nelua --cflags="-L ."` adjust it accordingly to where you have saved raylib.nelua 
+**1.** Run the code by passing a C Flag to the C Compiler (path to raylib.nelua) `nelua main.nelua` adjust it accordingly to where you have saved raylib.nelua 
 
 **2.** Advised to use [.neluacfg.lua as seen here as example.](https://github.com/edubart/nelua-lang/discussions/67) for easier running & building of your project.
 
