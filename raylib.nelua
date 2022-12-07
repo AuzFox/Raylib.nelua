@@ -7,9 +7,9 @@ if compiler.get_cc_info().is_emscripten then
     primtypes.integer = primtypes.int32
     primtypes.uinteger = primtypes.uint32
     primtypes.number = primtypes.float32
-    cflags '-Os -Wall'
-    cflags './lib/libraylib.a -I./include/ -L./lib/'
-    cflags '-s USE_GLFW=3 -DPLATFORM_WEB'
+    cflags '-Os -Wall' -- Change your optimisation options to suit your needs.
+    cflags './lib/libraylib.a -I./include/ -L./lib/' -- Include & Library locations
+    cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1' -- Recommended to not touch.
 else
     -- NOTE: raylib should always be linked first
     linklib "raylib"
