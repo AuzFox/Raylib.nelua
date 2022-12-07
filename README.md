@@ -8,7 +8,7 @@
 - Windows
 - MacOS
 - Linux
-- [Web]((#web-export-via-emscripten))
+- [Web](#web-export-via-emscripten)
 
 ## Covered APIs
 - [X] raylib.h - Finished
