@@ -97,7 +97,7 @@ global rl.matrix: type <cimport'Matrix', cinclude'<raylib.h>',nodecl> = @record{
 }
 
 -- Color, 4 components, R8G8B8A8 (32bit)
-global rl.color: type <cimport, nodecl> = @record{
+global rl.color: type <cimport'Color', cinclude'<raylib.h>', nodecl> = @record{
     r: cuchar,                                              -- Color red value
     g: cuchar,                                              -- Color green value
     b: cuchar,                                              -- Color blue value
