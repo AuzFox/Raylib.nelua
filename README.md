@@ -8,7 +8,7 @@
 - Windows
 - MacOS
 - Linux
-- [Web]((#web-export-via-emscripten))
+- [Web](#web-export-via-emscripten)
 
 ## Covered APIs
 - [X] raylib.h - Finished
@@ -97,9 +97,8 @@ local SCREEN_HEIGHT: uint16 <comptime> = 450
 
 ## if not PLATFORM_WEB then
    rl.setConfigFlags(rl.configFlags.FLAG_VSYNC_HINT) -- Enable VSYNC if we're building for Desktop
-## else
-
 ## end
+
 rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "raylib-nelua [core] example - basic window")
 
 local function update()
@@ -121,9 +120,11 @@ end
 ## if PLATFORM_WEB then
    rl.wasmSetMainLoop(update, 0, 1) -- If building for web, pass wasmSetMainLoop which calls emscripten_set_main_loop. Don't use if you're passing ASYNCIFY flag!
 ## else
+
    while not rl.windowShouldClose() do
       update()
    end
+
 ##end
 
 --------------------------------------------------------------------------------------
