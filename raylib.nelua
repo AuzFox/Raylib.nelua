@@ -1,4 +1,6 @@
 require 'math'
+require 'string'
+
 ##[[
 cinclude "raylib.h"
 local compiler = require 'nelua.ccompiler'
@@ -87,7 +89,7 @@ global rl.vector4: type <cimport'Vector4', cinclude'<raylib.h>',nodecl> = @recor
 
 -- Quaternion, 4 components (vector4 alias)
 global rl.quaternion: type = @rl.vector4
-
+## rl.value.metafields.quaternion.value.quaternion = true
 -- matrix, 4x4 components, column major, OpenGL style, right handed
 global rl.matrix: type <cimport'Matrix', cinclude'<raylib.h>',nodecl> = @record{
     m0: float32, m4: float32, m8: float32, m12: float32,    -- Matrix first row (4 components)
@@ -103,6 +105,7 @@ global rl.color: type <cimport'Color', cinclude'<raylib.h>', nodecl> = @record{
     b: cuchar,                                              -- Color blue value
     a: cuchar                                               -- Color alpha value
 }
+## rl.value.metafields.color.value.color = true
 
 -- Rectangle, 4 components
 global rl.rectangle: type <cimport'Rectangle', cinclude'<raylib.h>',nodecl> = @record{
@@ -1497,13 +1500,13 @@ function rl.vector2:angle(v2: rl.vector2) <inline>
     return math.atan2(v2.y, v2.x) - math.atan2(self.y, self.x)
 end
 
-function rl.vector2.__mul(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline>
-    ## if val1.type.is_vector2 and val2.type.is_vector2 then
-        return (@rl.vector2){val1.x * val2.x, val1.y * val2.y}
-    ## elseif val1.type.is_vector2 then
-        return (@rl.vector2){val1.x * val2, val1.y * val2}
-    ## elseif val2.type.is_vector2 then
-        return (@rl.vector2){val1 * val2.x, val1 * val2.y}
+function rl.vector2.__mul(v1: rl.vector2_or_scalar_concept, v2: rl.vector2_or_scalar_concept) <inline>
+    ## if v1.type.is_vector2 and v2.type.is_vector2 then
+        return (@rl.vector2){v1.x * v2.x, v1.y * v2.y}
+    ## elseif v1.type.is_vector2 then
+        return (@rl.vector2){v1.x * v2, v1.y * v2}
+    ## elseif v2.type.is_vector2 then
+        return (@rl.vector2){v1 * v2.x, v1 * v2.y}
     ## end
 end
 
@@ -1511,14 +1514,46 @@ function rl.vector2:__unm() <inline>
     return (@rl.vector2){-self.x, -self.y}
 end
 
-function rl.vector2.__div(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept) <inline>
-    ## if val1.type.is_vector2 and val2.type.is_vector2 then
-        return (@rl.vector2){val1.x / val2.x, val1.y / val2.y}
-    ## elseif val1.type.is_vector2 then
-        return (@rl.vector2){val1.x / val2, val1.y / val2}
-    ## elseif val2.type.is_vector2 then
-        return (@rl.vector2){val1 / val2.x, val1 / val2.y}
+function rl.vector2.__div(v1: rl.vector2_or_scalar_concept, v2: rl.vector2_or_scalar_concept) <inline>
+    ## if v1.type.is_vector2 and v2.type.is_vector2 then
+        return (@rl.vector2){v1.x / v2.x, v1.y / v2.y}
+    ## elseif v1.type.is_vector2 then
+        return (@rl.vector2){v1.x / v2, v1.y / v2}
+    ## elseif v2.type.is_vector2 then
+        return (@rl.vector2){v1 / v2.x, v1 / v2.y}
     ## end
+end
+
+function rl.vector2.__lt(v1: rl.vector2, v2: rl.vector2): boolean <inline>
+    return (v1.x < v2.x) and (v1.y < v2.y)
+end
+
+function rl.vector2.__le(v1: rl.vector2, v2: rl.vector2): boolean <inline>
+    return (v1.x <= v2.x) and (v1.y <= v2.y)
+end
+
+function rl.vector2.__idiv(v1: rl.vector2, v2: rl.vector2): rl.vector2 <inline>
+    return (@rl.vector2){v1.x // v2.x, v1.y // v2.y}
+end 
+
+function rl.vector2.__tdiv(v1: rl.vector2, v2: rl.vector2): rl.vector2 <inline>
+    return (@rl.vector2){v1.x /// v2.x, v1.y /// v2.y}
+end
+
+function rl.vector2:__pow(n: number): rl.vector2 <inline>
+    return (@rl.vector2){self.x ^ n, self.y ^ n}
+end
+
+function rl.vector2:__tmod(v2: rl.vector2): rl.vector2 <inline>
+    return (@rl.vector2){self.x %%% v2.x, self.y %%% v2.y}
+end
+
+function rl.vector2:__mod(v2: rl.vector2): rl.vector2 <inline>
+    return (@rl.vector2){self.x % v2.x, self.y % v2.y}
+end
+
+function rl.vector2:__tostring(): string <inline>
+  return "Vector2: (" .. "X: " .. tostring(self.x) .. ", " .. "Y: " .. tostring(self.y) .. ")"
 end
 
 function rl.vector2:normalise() <inline>
@@ -1635,8 +1670,8 @@ function rl.vector2:clampValue(min: float32, max: float32) <inline>
     end
 end
 
-function rl.vector2:__eq(v2: rl.vector2)
-    return self.x == v2.x and self.y == v2.y
+function rl.vector2.__eq(v1: rl.vector2, v2: rl.vector2)
+    return v1.x == v2.x and v1.y == v2.y
 end
 
 
@@ -1773,6 +1808,38 @@ function rl.vector3.__div(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_o
     ## elseif val2.type.is_vector3 then
         return (@rl.vector3){val1 / val2.x, val1 / val2.y, val1 / val2.z}
     ## end
+end
+
+function rl.vector3.__lt(v1: rl.vector3, v2: rl.vector3): boolean <inline>
+    return (v1.x < v2.x) and (v1.y < v2.y) and (v1.z < v2.z)
+end
+
+function rl.vector3.__le(v1: rl.vector3, v2: rl.vector3): boolean <inline>
+    return (v1.x <= v2.x) and (v1.y <= v2.y) and (v1.z <= v2.z)
+end
+
+function rl.vector3.__idiv(v1: rl.vector3, v2: rl.vector3): rl.vector3 <inline>
+    return (@rl.vector3){v1.x // v2.x, v1.y // v2.y, v1.z // v2.z}
+end 
+
+function rl.vector3.__tdiv(v1: rl.vector3, v2: rl.vector3): rl.vector3 <inline>
+    return (@rl.vector3){v1.x /// v2.x, v1.y /// v2.y, v1.z // v2.z}
+end
+
+function rl.vector3:__pow(n: number): rl.vector3 <inline>
+    return (@rl.vector3){self.x ^ n, self.y ^ n, self.z ^ n}
+end
+
+function rl.vector3:__tmod(v2: rl.vector3): rl.vector3 <inline>
+    return (@rl.vector3){self.x %%% v2.x, self.y %%% v2.y, self.z %%% v2.z}
+end
+
+function rl.vector3:__mod(v2: rl.vector3): rl.vector3 <inline>
+    return (@rl.vector3){self.x % v2.x, self.y % v2.y, self.y % v2.z}
+end
+
+function rl.vector3:__tostring(): string <inline>
+  return "Vector3: (" .. "X: " .. tostring(self.x) .. ", " .. "Y: " .. tostring(self.y) .. "," .. "Z: " .. tostring(self.z) .. ")"
 end
 
 function rl.vector3:normalise() <inline>
