@@ -140,6 +140,14 @@ rl.closeWindow()       -- Close window and OpenGL context
 
 **6.** Enjoy!
 
+## TODO
+- [0] Create easings.h binding.
+- [0] Create raygui.h binding.
+- [0] Move emscripten cflags out of raylib.nelua and encourage user specific settings.
+- [0] Document the API.
+
+... Possibly more.
+
 ## Development
 
 Further plans to incorporate easings.h raymath.h and raygui.h is planned to bring a complete Raylib experience to Nelua.
