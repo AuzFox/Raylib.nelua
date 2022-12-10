@@ -14,7 +14,7 @@
 - [X] raylib.h - Finished
 - [X] raymath.h - Finished, Vector2 and Vector3 math are all using methods, matrix and quaternions use functions!
 - [X] web export - Ability to export to web via emscripten. [Please read below](#web-export-via-emscripten).
-- [0] easings.h - Planned
+- [X] easings.h - Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)
 - [0] raygui.h - Planned
 
 ## Installation
@@ -141,7 +141,7 @@ rl.closeWindow()       -- Close window and OpenGL context
 **6.** Enjoy!
 
 ## TODO
-- [0] Create easings.h binding.
+- [X] Create easings.h binding. Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)
 - [0] Create raygui.h binding.
 - [0] Move emscripten cflags out of raylib.nelua and encourage user specific settings.
 - [0] Document the API.
