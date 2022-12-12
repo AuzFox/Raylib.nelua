@@ -86,6 +86,14 @@ Those are highly recommended settings to get started, but [I encourage you to re
 ```lua
 require "raylib"
 require 'allocators.gc'
+
+##[[
+    cflags '-O3 -Wall' -- Change your optimisation options to suit your needs.
+    cflags './source/dependencies/lib/libraylib.a -I./source/dependencies/include/ -L./source/dependencies/lib/' -- Include & Library locations
+    cflags '--preload-file ./source/assets'
+    cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1'
+]]
+
 ## if PLATFORM_WEB then
    collectgarbage('stop') -- conservative GCs cannot run automatically with emscripten
 ## end
