@@ -2,20 +2,20 @@
 # Raylib-Nelua
 [Nelua](https://nelua.io/) binding for [Raylib](http://www.raylib.com/) a simple and easy-to-use library to learn videogames programming.
 
-*Using Raylib Version 4.5-dev*
+*Using Raylib Version 4.5-dev!*
 
-## Supported Platforms
-- Windows
-- MacOS
-- Linux
-- [Web](#web-export-via-emscripten)
+## Covered APIs & Supported Platforms
 
-## Covered APIs
-- [X] raylib.h - Finished
-- [X] raymath.h - Finished, Vector2 and Vector3 math are all using methods, matrix and quaternions use functions!
-- [X] web export - Ability to export to web via emscripten. [Please read below](#web-export-via-emscripten).
-- [X] easings.h - Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)
-- [0] raygui.h - Planned
+| API & Systems  | Status                | Notes    |
+|:-------:|:------------------:|:------------------:|
+| raylib.h     | :heavy_check_mark: |Finished       |
+| raymath.h    | :heavy_check_mark: |Finished, Vector2 and Vector3 math are all using methods, matrix and quaternions use functions!|
+| raygui.h     | :x:                |Planned        |
+| easings.h    | :heavy_check_mark: |Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)   |
+| web export   | :heavy_check_mark: |Ability to export to web via emscripten. [Please read below](#web-export-via-emscripten).|
+| windows      | :heavy_check_mark: |N/A            | 
+| linux        | :heavy_check_mark: |N/A            | 
+
 
 ## Installation
 
