@@ -88,10 +88,12 @@ require "raylib"
 require 'allocators.gc'
 
 ##[[
-    cflags '-O3 -Wall' -- Change your optimisation options to suit your needs.
-    cflags './source/dependencies/lib/libraylib.a -I./source/dependencies/include/ -L./source/dependencies/lib/' -- Include & Library locations
-    cflags '--preload-file ./source/assets'
-    cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1'
+    if PLATFORM_WEB then
+     cflags '-O3 -Wall' -- Change your optimisation options to suit your needs.
+     cflags './source/dependencies/lib/libraylib.a -I./source/dependencies/include/ -L./source/dependencies/lib/' -- Include & Library locations
+     cflags '--preload-file ./source/assets'
+     cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1 -s ASYNCIFY' -- Recommended to not touch.
+    end
 ]]
 
 ## if PLATFORM_WEB then
