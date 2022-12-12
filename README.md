@@ -151,7 +151,7 @@ rl.closeWindow()       -- Close window and OpenGL context
 ## TODO
 - [X] Create easings.h binding. Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)
 - [0] Create raygui.h binding.
-- [0] Move emscripten cflags out of raylib.nelua and encourage user specific settings.
+- [X] Move emscripten cflags out of raylib.nelua and encourage user specific settings.
 - [0] Document the API.
 
 ... Possibly more.
