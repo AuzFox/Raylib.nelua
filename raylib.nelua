@@ -301,11 +301,12 @@ global rl.wave: type <cimport'Wave', cinclude'<raylib.h>',nodecl> = @record{
 }
 
 global rl.rAudioBuffer: type <cimport'rAudioBuffer', cinclude'<raylib.h>',nodecl,forwarddecl> = @record{}
-
+global rl.rAudioProcessor: type <cimport'rAudioProcessor', cinclude'<raylib.h>',nodecl,forwarddecl> = @record{}
 -- AudioStream, custom audio stream
 global rl.audioStream: type <cimport'AudioStream', cinclude'<raylib.h>',nodecl> = @record{
     buffer: *rl.rAudioBuffer,
-
+    processor: *rl.rAudioProcessor,
+    
     sampleRate: cuint,
     sampleSize: cuint,
     channels: cuint
