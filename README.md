@@ -15,6 +15,7 @@
 | web export   | :heavy_check_mark: |Ability to export to web via emscripten. [Please read below](#web-export-via-emscripten).|
 | windows      | :heavy_check_mark: |N/A            | 
 | linux        | :heavy_check_mark: |N/A            | 
+| macOS        | :heavy_check_mark: |Not tested on M1/M2 chips           | 
 
 
 ## Installation
