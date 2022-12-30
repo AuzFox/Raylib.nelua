@@ -10,7 +10,7 @@
 |:-------:|:------------------:|:------------------:|
 | raylib.h     | :heavy_check_mark: |Finished       |
 | raymath.h    | :heavy_check_mark: |Finished, Vector2 and Vector3 math are all using methods, matrix and quaternions use functions!|
-| raygui.h     | :x:                |Planned        |
+| raygui.h     | :x:                |Not planned    |
 | easings.h    | :heavy_check_mark: |Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)   |
 | web export   | :heavy_check_mark: |Ability to export to web via emscripten. [Please read below](#web-export-via-emscripten).|
 | windows      | :heavy_check_mark: |N/A            | 
