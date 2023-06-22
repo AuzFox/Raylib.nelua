@@ -246,7 +246,7 @@ require 'allocators.gc'
      cflags '-O3 -Wall' -- Change your optimisation options to suit your needs.
      cflags './source/dependencies/lib/libraylib.a -I./source/dependencies/include/ -L./source/dependencies/lib/' -- Include & Library locations
      cflags '--preload-file ./source/assets'
-     cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1 -s ASYNCIFY' -- Recommended to not touch.
+     cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1' -- Recommended to not touch.
     end
 ]]
 
@@ -305,7 +305,7 @@ rl.closeWindow()       -- Close window and OpenGL context
 > 
 > - Your library and include files have to be placed in a folder "libs"/"include" respectively. You can, however change those settings in raylib.nelua.
 > 
-> - You have to pass `rl.wasmSetMainLoop(UpdateFunctionHere, 0, 1)`  function.
+> - You have to pass `rl.wasmSetMainLoop(UpdateFunctionHere, 0, 1)` function as seen on example above if you're not planning to use `-s ASYNCIFY` flag. [Read more about this here](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)#42-use-standard-raylib-whilewindowshouldclose-loop).
 >
 > - To build, pass emcc to to Nelua compiler
 
