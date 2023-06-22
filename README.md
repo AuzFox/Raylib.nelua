@@ -2,7 +2,7 @@
 # Raylib-Nelua
 [Nelua](https://nelua.io/) binding for [Raylib](http://www.raylib.com/) a simple and easy-to-use library to learn videogames programming.
 
-*Using Raylib Version 4.5-dev!*
+*Using Raylib Version 4.5!*
 
 ## Covered APIs & Supported Platforms
 
@@ -31,7 +31,7 @@ require "raylib"
 local SCREEN_WIDTH: uint16 <comptime> = 800
 local SCREEN_HEIGHT: uint16 <comptime> = 450
 
-rl.setConfigFlags(rl.configFlags.FLAG_VSYNC_HINT) -- Enable VSYNC
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT) -- Enable VSYNC
 rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "raylib-nelua [core] example - basic window")
 
 --------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ local SCREEN_WIDTH: uint16 <comptime> = 800
 local SCREEN_HEIGHT: uint16 <comptime> = 450
 
 ## if not PLATFORM_WEB then
-   rl.setConfigFlags(rl.configFlags.FLAG_VSYNC_HINT) -- Enable VSYNC if we're building for Desktop
+   rl.setConfigFlags(rl.configFlags.VSYNC_HINT) -- Enable VSYNC if we're building for Desktop
 ## end
 
 rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "raylib-nelua [core] example - basic window")

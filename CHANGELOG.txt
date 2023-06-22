@@ -4,3 +4,12 @@
 - Include extra optional rcamera.nelua submodule with additional camera functionalities
 - Add optional closures: rl.drawing(), rl.mode2D(), rl.mode3D(), rl.textureMode(), rl.shaderMode(), rl.blendingMode(), rl.scissorMode(), rl.vrMode()
 - Licence changed to Zlib
+
+- IMPORTANT:
+- Modified all enums to remove prefixes of their respective values for brevity and readability, all enums are affected by this change.
+- As an example:
+enum rl.shaderAttributeDataType:
+  - Renamed `SHADER_ATTRIB_FLOAT` to `ATTRIB_FLOAT`
+  - Renamed `SHADER_ATTRIB_VEC2` to `ATTRIB_VEC2`
+  - Renamed `SHADER_ATTRIB_VEC3` to `ATTRIB_VEC3`
+  - Renamed `SHADER_ATTRIB_VEC4` to `ATTRIB_VEC4`
