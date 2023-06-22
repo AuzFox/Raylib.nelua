@@ -1,4 +1,12 @@
 22/06/2023:
+- Updated README section.
+- Added examples
+- Fixed mangled imports for rl.drawCube
+- Add missing parameter for rl.updateCamera
+- Add missing parameter for rl.mode3D closure
+
+
+22/06/2023:
 
 - Update Raylib.nelua to version 4.5
 - Include extra optional rcamera.nelua submodule with additional camera functionalities

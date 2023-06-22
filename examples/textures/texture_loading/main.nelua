@@ -1,0 +1,40 @@
+require "raylib"
+
+-- Constants
+--------------------------------------------------------------------------------------
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+--------------------------------------------------------------------------------------
+
+-- Initialization
+--------------------------------------------------------------------------------------
+
+rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "Raylib.nelua [textures] example - texture loading and drawing")
+rl.setTargetFPS(60)
+
+-- NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
+local texture = rl.loadTexture("./resources/logo.png") -- Texture loading
+
+-- Main game loop
+
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+   -- Update
+   -- TODO: Update your variables here
+   ----------------------------------------------------------------------------------
+
+   -- Draw
+   ----------------------------------------------------------------------------------
+   rl.drawing(function()
+      rl.clearBackground(rl.RAYWHITE)
+
+      rl.drawTexture(texture, SCREEN_WIDTH/2 - texture.width/2, SCREEN_HEIGHT/2 - texture.height/2, rl.WHITE)
+
+      rl.drawText("this IS a texture!", 360, 370, 10, rl.GRAY);
+    end)
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.unloadTexture(texture) -- Texture unloading
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------

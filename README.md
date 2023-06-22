@@ -1,28 +1,25 @@
- <a href="https://nelua.io/"><img style="vertical-align:middle" src=https://i.imgur.com/QMUU0ed.png></a>
-# Raylib-Nelua
-[Nelua](https://nelua.io/) binding for [Raylib](http://www.raylib.com/) a simple and easy-to-use library to learn videogames programming.
+<div align="center">
+<p>
 
-*Using Raylib Version 4.5!*
+<img width="200" src="./assets/logo.png"></img>
 
-## Covered APIs & Supported Platforms
+# Raylib.nelua - [Raylib](https://www.raylib.com/) binding for the [Nelua Programming Language](https://nelua.io/)
 
-| API & Systems  | Status                | Notes    |
-|:-------:|:------------------:|:------------------:|
-| raylib.h     | :heavy_check_mark: |Finished       |
-| raymath.h    | :heavy_check_mark: |Finished, Vector2 and Vector3 math are all using methods, matrix and quaternions use functions!|
-| raygui.h     | :x:                |Not planned    |
-| easings.h    | :heavy_check_mark: |Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)   |
-| web export   | :heavy_check_mark: |Ability to export to web via emscripten. [Please read below](#web-export-via-emscripten).|
-| windows      | :heavy_check_mark: |N/A            | 
-| linux        | :heavy_check_mark: |N/A            | 
-| macOS        | :heavy_check_mark: |Not tested on M1/M2 chips           | 
+</p>
 
+[Installation](./INSTALL.md) • [Development](./DEVELOPMENT.md) • [Contributing](./CONTRIBUTING.md) • [License](./LICENSE)
 
-## Installation
+</div>
 
-**1.** Download or clone the repository and place **raylib.nelua** in your project folder or anywhere else you want.
+**Raylib.nelua** is a [Raylib](https://www.raylib.com/) binding for latest Raylib 4.5 version. A simple and easy-to-use library to learn videogames programming.
 
-**2.** Create your main file that holds your code. (as example main.nelua) and start writing your Raylib code in Nelua:
+Raylib.nelua. It's like Raylib on steroids, except without the harmful side effects. This delightful little binding brings the power and simplicity of Nelua to the world of Raylib game development.
+
+### Code Example
+
+<details>
+<summary><b>Basic Window</b></summary>
+
 ```lua
 require "raylib"
 
@@ -39,23 +36,22 @@ rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "raylib-nelua [core] example - basic w
 -- Main game loop
 
 while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+  -- Update
+  ----------------------------------------------------------------------------------
+  -- TODO: Update your variables here
+  ----------------------------------------------------------------------------------
 
-    -- Update
-    ----------------------------------------------------------------------------------
-    -- TODO: Update your variables here
-    ----------------------------------------------------------------------------------
+  -- Draw
+  ----------------------------------------------------------------------------------
+  
+  rl.beginDrawing()
 
-    -- Draw
-    ----------------------------------------------------------------------------------
+    rl.clearBackground(rl.RAYWHITE)
 
-    rl.beginDrawing()
+    rl.drawText("Congrats! You created your first window!", 190, 200, 20, rl.LIGHTGRAY)
 
-        rl.clearBackground(rl.RAYWHITE)
-
-        rl.drawText("Congrats! You created your first window!", 190, 200, 20, rl.LIGHTGRAY)
-
-    rl.endDrawing()
-    -----------------------------------------------------------------------------------
+  rl.endDrawing()
+  -----------------------------------------------------------------------------------
 end
 
 -- De-Initialization
@@ -64,26 +60,183 @@ rl.closeWindow()       -- Close window and OpenGL context
 -------------------------------------------------------------------------------------
 ```
 
-## Usage
+</details>
 
-**1.** Run the code by passing a C Flag to the C Compiler (path to raylib.nelua) `nelua main.nelua` adjust it accordingly to where you have saved raylib.nelua 
+<details>
+<summary><b>Basic Keyboard Input</b></summary>
 
-**2.** Advised to use [.neluacfg.lua as seen here as example.](https://github.com/edubart/nelua-lang/discussions/67) for easier running & building of your project.
+```lua
+require "raylib"
 
-## Web export via Emscripten
-Exporting your Raylib-Nelua game/App is now possible with Emscripten! There are few important bits to take notes on before attempting.
+-- Constants
+--------------------------------------------------------------------------------------
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+--------------------------------------------------------------------------------------
 
-**1.** Emscripten must be installed on your system.
+-- Initialization
+--------------------------------------------------------------------------------------
 
-**2.** You have to provide your own Raylib 4.5-dev (build from source) libraylib.a and include files for web export. [Please read here](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)).
+rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "Raylib.nelua [core] example - keyboard input")
+rl.setTargetFPS(60)
 
-**3.** Your library and include files have to be placed in a folder "libs"/"include" respectively. You can, however change those settings in raylib.nelua.
+local ballPosition = rl.vector2{ SCREEN_WIDTH/2, SCREEN_HEIGHT/2 }
 
-**4.** When compiling down your code to wasm you have to pass `rl.wasmSetMainLoop(UpdateFunctionHere, 0, 1)` which under the hood is technically just emscripten_set_main_loop.
+-- Main game loop
 
-Those are highly recommended settings to get started, but [I encourage you to read about the emscripten_set_main_loop function.]((https://emscripten.org/docs/api_reference/emscripten.h.html#c.emscripten_set_main_loop))
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+  -- Update
+  ----------------------------------------------------------------------------------
+  if rl.isKeyDown(rl.keyboardKey.RIGHT) then ballPosition.x = ballPosition.x + 2 end
+  if rl.isKeyDown(rl.keyboardKey.LEFT) then ballPosition.x = ballPosition.x - 2 end
+  if rl.isKeyDown(rl.keyboardKey.UP) then ballPosition.y = ballPosition.y - 2 end
+  if rl.isKeyDown(rl.keyboardKey.DOWN) then ballPosition.y = ballPosition.y + 2 end 
 
-**4.5** Example code when exporting to web:
+  -- Draw
+  ----------------------------------------------------------------------------------
+  rl.drawing(function()
+    rl.clearBackground(rl.RAYWHITE)
+
+    rl.drawText("move the ballwith arrow keys", 10, 10, 20, rl.DARKGRAY)
+
+    rl.drawCircleV(ballPosition, 50, rl.MAROON)
+  end)
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------
+```
+
+</details>
+
+<details>
+<summary><b>Texture Loading and Drawing</b></summary>
+
+```lua
+require "raylib"
+
+-- Constants
+--------------------------------------------------------------------------------------
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+--------------------------------------------------------------------------------------
+
+-- Initialization
+--------------------------------------------------------------------------------------
+
+rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "Raylib.nelua [textures] example - texture loading and drawing")
+rl.setTargetFPS(60)
+
+-- NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
+local texture = rl.loadTexture("./resources/logo.png") -- Texture loading
+
+-- Main game loop
+
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+   -- Update
+   -- TODO: Update your variables here
+   ----------------------------------------------------------------------------------
+
+   -- Draw
+   ----------------------------------------------------------------------------------
+   rl.drawing(function()
+      rl.clearBackground(rl.RAYWHITE)
+
+      rl.drawTexture(texture, SCREEN_WIDTH/2 - texture.width/2, SCREEN_HEIGHT/2 - texture.height/2, rl.WHITE)
+
+      rl.drawText("this IS a texture!", 360, 370, 10, rl.GRAY);
+    end)
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.unloadTexture(texture) -- Texture unloading
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------
+```
+
+</details>
+
+<details>
+<summary><b>3D Free Camera</b></summary>
+
+```lua
+require "raylib"
+
+-- Constants
+--------------------------------------------------------------------------------------
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+--------------------------------------------------------------------------------------
+
+-- Initialization
+--------------------------------------------------------------------------------------
+
+rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "Raylib.nelua [core] example - 3d camera free")
+
+local camera = rl.camera3D{} -- Define the camera to look into our 3d world
+camera.position = rl.vector3{ 10, 10, 10 } -- Camera position
+camera.target = rl.vector3{ 0, 0, 0 } -- Camera looking at point
+camera.up = rl.vector3{ 0, 1, 0 } -- Camera up vector (rotation towards target)
+camera.fovy = 45 -- Camera field-of-view Y
+camera.projection = rl.cameraProjection.PERSPECTIVE -- Camera projection type
+
+local cubePosition = rl.vector3{ 0, 0, 0 }
+
+
+rl.disableCursor() -- Limit cursor to relative movement inside the window
+
+rl.setTargetFPS(60)
+------------------------------------------------------------------------------------
+
+-- Main game loop
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+  
+  -- Update
+  ----------------------------------------------------------------------------------
+  rl.updateCamera(&camera, rl.cameraMode.FREE)
+  
+  if rl.isKeyDown(rl.keyboardKey.Z) then camera.target = rl.vector3{ 0, 0, 0 } end
+
+
+  -- Draw
+  ----------------------------------------------------------------------------------
+  rl.drawing(function()
+    rl.clearBackground(rl.RAYWHITE)
+
+    rl.mode3D(camera, function()
+      rl.drawCube(cubePosition, 2, 2, 2, rl.RED)
+      rl.drawCubeWires(cubePosition, 2, 2, 2, rl.MAROON)
+
+      rl.drawGrid(10, 1)
+    end)
+
+    rl.drawRectangle(10, 10, 320, 133, rl.fade(rl.SKYBLUE, 0.5))
+    rl.drawRectangleLines( 10, 10, 320, 133, rl.BLUE)
+
+    rl.drawText("Free camera default controls:", 20, 20, 10, rl.BLACK)
+    rl.drawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, rl.DARKGRAY)
+    rl.drawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, rl.DARKGRAY)
+    rl.drawText("- Alt + Mouse Wheel Pressed to Rotate", 40, 80, 10, rl.DARKGRAY)
+    rl.drawText("- Alt + Ctrl + Mouse Wheel Pressed for Smooth Zoom", 40, 100, 10, rl.DARKGRAY)
+    rl.drawText("- Z to zoom to (0, 0, 0)", 40, 120, 10, rl.DARKGRAY)
+
+  end)
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------
+```
+
+</details>
+
+<details>
+<summary><b>Export to Web via Emscripten</b></summary>
+
 ```lua
 require "raylib"
 require 'allocators.gc'
@@ -103,24 +256,21 @@ require 'allocators.gc'
 
 -- Initialization
 --------------------------------------------------------------------------------------
-local SCREEN_WIDTH: uint16 <comptime> = 800
-local SCREEN_HEIGHT: uint16 <comptime> = 450
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
 
 ## if not PLATFORM_WEB then
-   rl.setConfigFlags(rl.configFlags.VSYNC_HINT) -- Enable VSYNC if we're building for Desktop
+  rl.setConfigFlags(rl.configFlags.VSYNC_HINT) -- Enable VSYNC if we're building for Desktop
 ## end
 
-rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "raylib-nelua [core] example - basic window")
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [core] example - basic window")
 
 local function update()
-   rl.beginDrawing()
 
-        rl.clearBackground(rl.RAYWHITE)
-
-        rl.drawText("Congrats! You created your first window!", 190, 200, 20, rl.LIGHTGRAY)
-
-    rl.endDrawing()
-
+  rl.beginDrawing()
+    rl.clearBackground(rl.RAYWHITE)
+    rl.drawText("Congrats! You created your first window!", 190, 200, 20, rl.LIGHTGRAY)
+  rl.endDrawing()
 
    ## if PLATFORM_WEB then
       collectgarbage() -- safe to collect garbage here
@@ -147,42 +297,22 @@ rl.closeWindow()       -- Close window and OpenGL context
 -------------------------------------------------------------------------------------
 ```
 
-**5.** Build your game using the following command `sudo nelua -V --cc emcc -b -o build/index ./main.nelua`
+> Note:
+>
+> - Emscripten must be installed on your system.
+> 
+> - You have to provide your own Raylib 4.5-dev (build from source) libraylib.a and include files for web export. [Please read here](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)).
+> 
+> - Your library and include files have to be placed in a folder "libs"/"include" respectively. You can, however change those settings in raylib.nelua.
+> 
+> - You have to pass `rl.wasmSetMainLoop(UpdateFunctionHere, 0, 1)`  function.
+>
+> - To build, pass emcc to to Nelua compiler
 
-**6.** Enjoy!
+</detais>
 
-## TODO
-- [X] Create easings.h binding. Finished, rayeasings.nelua holds all easings functions and functions can be called via rle. (raylib easings)
-- [0] Create raygui.h binding.
-- [X] Move emscripten cflags out of raylib.nelua and encourage user specific settings.
-- [0] Document the API.
+<p>
 
-... Possibly more.
+More examples can be found [here.](https://github.com/Its-Kenta/Raylib.nelua/tree/main/examples)
 
-## Development
-
-Further plans to incorporate easings.h raymath.h and raygui.h is planned to bring a complete Raylib experience to Nelua.
-
-There is a good chance that certain functions are missing; report them if you do!
-They will be included right away.
-
-Contributions are encouraged. 
-
-## Contributing
-
-1. Fork it (<https://github.com/your-github-user/Raylib-Nelua/fork>)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
-
-If you plan to contribute please make sure you follow the same coding convention to match overall style of this binding (camelCases)
-
-## Contributors
-
-- [Kenta](https://github.com/Its-Kenta) - Creator and maintainer
-
-## Credits
-
-- [Andre-LA](https://github.com/Andre-LA/) - Their old raylib binding that has been used as example & Raylib-Nelua logo.
-- [AbdulKalam21](https://github.com/AbdulKalam21) - Using their old raylib binding as a template.
+</p>

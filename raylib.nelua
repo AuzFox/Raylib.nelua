@@ -978,7 +978,7 @@ function rl.getGesturePinchAngle(): float32 <cimport'GetGesturePinchAngle', cinc
 --------------------------------------------------------------------------------------
 -- camera System Functions (Module: rcamera)
 --------------------------------------------------------------------------------------
-function rl.updateCamera(camera: *rl.camera): void <cimport'UpdateCamera', cinclude'<raylib.h>',nodecl> end
+function rl.updateCamera(camera: *rl.camera, mode: cint): void <cimport'UpdateCamera', cinclude'<raylib.h>',nodecl> end
 function rl.updateCameraPro(camera: *rl.camera, movement: rl.vector3, rotation: rl.vector3, zoom: float32): void <cimport'UpdateCameraPro', cinclude'<raylib.h>',nodecl> end
 
 --------------------------------------------------------------------------------------
@@ -1237,7 +1237,7 @@ function rl.drawPoint3D(position: rl.vector3, color: rl.color): void <cimport'Dr
 function rl.drawCircle3D(center: rl.vector3, radius: float32, rotationAxis: rl.vector3, rotationAngle: float32, color: rl.color): void <cimport'DrawCircle3D', cinclude'<raylib.h>',nodecl> end
 function rl.drawTriangle3D(v1: rl.vector3, v2: rl.vector3, v3: rl.vector3, color: rl.color): void <cimport'DrawTriangle3D', cinclude'<raylib.h>',nodecl> end
 function rl.drawTriangleStrip3D(points: *rl.vector3, pointsCount: cint, color: rl.color): void <cimport'DrawTriangleStrip3D', cinclude'<raylib.h>',nodecl> end
-function rl.drawCube(position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'WaitTDrawCubeime', cinclude'<raylib.h>',nodecl> end
+function rl.drawCube(position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'DrawCube', cinclude'<raylib.h>',nodecl> end
 function rl.drawCubeV(position: rl.vector3, size: rl.vector3, color: rl.color): void <cimport'DrawCubeV', cinclude'<raylib.h>',nodecl> end
 function rl.drawCubeWires(position: rl.vector3, width: float32, height: float32, length: float32, color: rl.color): void <cimport'DrawCubeWires', cinclude'<raylib.h>',nodecl> end
 function rl.drawCubeWiresV(position: rl.vector3, size: rl.vector3, color: rl.color): void <cimport'DrawCubeWiresV', cinclude'<raylib.h>',nodecl> end
