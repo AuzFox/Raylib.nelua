@@ -44,7 +44,7 @@ MyCodeFolder:
 ```
 
 
-> Note:
+> **Notes**
 >
 > You can also use .neluacfg to setup custom locations for your libraries. [Please see the following example.](https://github.com/edubart/nelua-lang/discussions/67)`
 

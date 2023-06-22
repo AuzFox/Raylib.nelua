@@ -297,7 +297,7 @@ rl.closeWindow()       -- Close window and OpenGL context
 -------------------------------------------------------------------------------------
 ```
 
-> Note:
+> **Notes**
 >
 > - Emscripten must be installed on your system.
 > 
