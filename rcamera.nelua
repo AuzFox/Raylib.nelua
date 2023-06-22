@@ -1,0 +1,23 @@
+require "raylib"
+
+##[[
+cinclude "rcamera.h"
+]]
+
+-- Raylib camera
+global rlc = @record{}
+
+--------------------------------------------------------------------------------------
+-- Extra camera System Functions (Module: rcamera)
+--------------------------------------------------------------------------------------
+function rlc.getCameraForward(camera: *rl.camera): rl.vector3 <cimport'GetCameraForward', cinclude'<rcamera.h>',nodecl> end
+function rlc.getCameraUp(camera: *rl.camera): rl.vector3 <cimport'GetCameraUp', cinclude'<rcamera.h>',nodecl> end
+function rlc.getCameraRight(camera: *rl.camera): rl.vector3 <cimport'GetCameraRight', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraMoveForward(camera: *rl.camera, distance: float32, moveInWorldPlane: boolean): void <cimport'CameraMoveForward', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraMoveUp(camera: *rl.camera, distance: float32): void <cimport'CameraMoveUp', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraMoveRight(camera: *rl.camera, distance: float32, moveInWorldPlane: boolean): void <cimport'CameraMoveRight', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraMoveToTarget(camera: *rl.camera, distance: float32, delta: float32): void <cimport'CameraMoveToTarget', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraYaw(camera: *rl.camera, angle: float32, rotateAroundTarget: boolean): void <cimport'CameraYaw', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraPitch(camera: *rl.camera, angle: float32, lockView: boolean, rotateAroundTarget: boolean, rotateUp: boolean): void <cimport'CameraPitch', cinclude'<rcamera.h>',nodecl> end
+function rlc.cameraRoll(camera: *rl.camera, angle: float32): void <cimport'CameraRoll', cinclude'<rcamera.h>',nodecl> end
+function rlc.getCameraProjectionMatrix(camera: *rl.camera, aspect: float32): rl.matrix <cimport'GetCameraProjectionMatrix', cinclude'<rcamera.h>',nodecl> end

@@ -1,0 +1,6 @@
+22/06/2023:
+
+- Update Raylib.nelua to version 4.5
+- Include extra optional rcamera.nelua submodule with additional camera functionalities
+- Add optional closures: rl.drawing(), rl.mode2D(), rl.mode3D(), rl.textureMode(), rl.shaderMode(), rl.blendingMode(), rl.scissorMode(), rl.vrMode()
+- Licence changed to Zlib
