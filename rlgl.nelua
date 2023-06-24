@@ -187,20 +187,12 @@ global rlgl.cullMode: type <cimport'rlCullMode', cinclude'<rlgl.h>',nodecl,using
 
 --------------------------------------------------------------------------------------------------------------------------
 
--- function rlgl.(): void <cimport'', cinclude'<rlgl.h>',nodecl> end
-
---[[
-  global rlgl.: type <cimport'', cinclude'<rlgl.h>',nodecl> = @record{
-
-}
-]]
-
 -- Matrix Operations
 function rlgl.matrixMode(mode: cint): void <cimport'rlMatrixMode', cinclude'<rlgl.h>',nodecl> end
 function rlgl.pushMatrix(): void <cimport'rlPushMatrix', cinclude'<rlgl.h>',nodecl> end
 function rlgl.popMatrix(): void <cimport'rlPopMatrix', cinclude'<rlgl.h>',nodecl> end
 function rlgl.loadIdentity(): void <cimport'rlLoadIdentity', cinclude'<rlgl.h>',nodecl> end
-function rlgl.translatef(x: float32, y: float32, z: float32): void <cimport'', cinclude'<rlgl.h>',nodecl> end
+function rlgl.translatef(x: float32, y: float32, z: float32): void <cimport'rlTranslatef', cinclude'<rlgl.h>',nodecl> end
 function rlgl.rotatef(angle: float32, x: float32, y: float32, z: float32): void <cimport'rlRotatef', cinclude'<rlgl.h>',nodecl> end
 function rlgl.scalef(x: float32, y: float32, z: float32): void <cimport'rlScalef', cinclude'<rlgl.h>',nodecl> end
 function rlgl.multMatrixf(matf: *float32): void <cimport'rlMultMatrixf', cinclude'<rlgl.h>',nodecl> end
