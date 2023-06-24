@@ -28,7 +28,6 @@ As Raylib updates roll out, **Raylib.nelua** will follow soon after. This bindin
 The current roadmap is:
 
 - [ ] Add raygui binding.
-- [ ] Add RLGL binding.
 
 ## Covered API
 
@@ -36,7 +35,7 @@ The current roadmap is:
 - [x] raymath.h
 - [x] easings.h
 - [ ] raygui.h
-- [ ] rlgl.h
+- [x] rlgl.h
 
 ## Known Issues
 
