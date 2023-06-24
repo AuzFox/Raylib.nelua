@@ -1,4 +1,7 @@
 24/06/2023:
+- RLGL: Change rlgl.renderBatch properties vertexBuffer and draws to unbound array
+
+24/06/2023:
 - Binding for RLGL - Not to be used as standalone for now. It calls Raylib.nelua
 
 22/06/2023:

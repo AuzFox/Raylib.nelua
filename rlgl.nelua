@@ -133,8 +133,8 @@ global rlgl.drawCall: type <cimport'rlDrawCall', cinclude'<rlgl.h>',nodecl> = @r
 global rlgl.renderBatch: type <cimport'rlRenderBatch', cinclude'<rlgl.h>',nodecl> = @record{
   bufferCount: cint,
 	currentBuffer: cint,
-	vertexBuffer: rlgl.vertexBuffer,
-	draws: rlgl.drawCall,
+	vertexBuffer: [0]rlgl.vertexBuffer,
+	draws: [0]rlgl.drawCall,
 	drawCounter: cint,
 	currentDepth: float32
 }
