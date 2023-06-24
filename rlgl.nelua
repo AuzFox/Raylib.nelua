@@ -1,0 +1,420 @@
+require 'raylib'
+##[[ cinclude "rlgl.h" ]]
+
+--[[
+  RLGL.nelua is a binding to Raylibs core RLGL. It is not created to be used for standalone purposes. RLGL.nelua relies on Raylib.nelua
+]]
+
+global rlgl = @record{}
+
+-- Texture parameters (equivalent to OpenGL defines)
+global rlgl.TEXTURE_WRAP_S <const> = 0x2802
+global rlgl.TEXTURE_WRAP_T <const>  = 0x2803
+global rlgl.TEXTURE_MAG_FILTER <const> = 0x2800
+global rlgl.TEXTURE_MIN_FILTER <const> = 0x2801
+global rlgl.TEXTURE_FILTER_NEAREST <const> = 0x2600
+global rlgl.TEXTURE_FILTER_LINEAR <const> = 0x2601
+global rlgl.TEXTURE_FILTER_MIP_NEAREST <const> = 0x2700
+global rlgl.TEXTURE_FILTER_NEAREST_MIP_LINEAR <const> = 0x2702
+global rlgl.TEXTURE_FILTER_LINEAR_MIP_NEAREST <const> = 0x2701
+global rlgl.TEXTURE_FILTER_MIP_LINEAR <const> = 0x2703
+global rlgl.TEXTURE_FILTER_ANISOTROPIC <const> = 0x3000
+global rlgl.TEXTURE_MIPMAP_BIAS_RATIO <const> = 0x4000 
+global rlgl.TEXTURE_WRAP_REPEAT <const> = 0x2901
+global rlgl.TEXTURE_WRAP_CLAMP <const> = 0x812F
+global rlgl.TEXTURE_WRAP_MIRROR_REPEAT <const> = 0x8370
+global rlgl.TEXTURE_WRAP_MIRROR_CLAMP  <const> = 0x8742
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Matrix modes (equivalent to OpenGL)
+global rlgl.MODELVIEW <const> = 0x1700
+global rlgl.PROJECTION <const> = 0x1701
+global rlgl.TEXTURE <const> = 0x1702
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Primitive assembly draw modes
+global rlgl.LINES <const> = 0x0001
+global rlgl.TRIANGLES <const> = 0x0004
+global rlgl.QUADS <const> = 0x0007
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- GL equivalent data types
+global rlgl.UNSIGNED_BYTE <const> = 0x1401 
+global rlgl.FLOAT <const> = 0x1406
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Buffer usage hint
+global rlgl.STREAM_DRAW  <const> = 0x88E0
+global rlgl.STREAM_READ  <const> = 0x88E1
+global rlgl.STREAM_COPY  <const> = 0x88E2
+global rlgl.STATIC_DRAW  <const> = 0x88E4
+global rlgl.STATIC_READ  <const> = 0x88E5
+global rlgl.STATIC_COPY  <const> = 0x88E6
+global rlgl.DYNAMIC_DRAW <const> = 0x88E8
+global rlgl.DYNAMIC_READ <const> = 0x88E9
+global rlgl.DYNAMIC_COPY <const> = 0x88EA
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- GL Shader type
+global rlgl.FRAGMENT_SHADER <const> = 0x8B30
+global rlgl.VERTEX_SHADER <const> = 0x8B31
+global rlgl.COMPUTE_SHADER <const> = 0x91B9
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- GL blending factors
+global rlgl.ZERO <const> = 0
+global rlgl.ONE <const> = 1
+global rlgl.SRC_COLOR <const> = 0x0300
+global rlgl.ONE_MINUS_SRC_COLOR <const> = 0x0301
+global rlgl.SRC_ALPHA <const> = 0x0302
+global rlgl.ONE_MINUS_SRC_ALPHA <const> = 0x0303
+global rlgl.DST_ALPHA <const> = 0x0304
+global rlgl.ONE_MINUS_DST_ALPHA <const> = 0x0305
+global rlgl.DST_COLOR <const> = 0x0306
+global rlgl.ONE_MINUS_DST_COLOR <const> = 0x0307
+global rlgl.SRC_ALPHA_SATURATE <const> = 0x0308
+global rlgl.CONSTANT_COLOR <const> = 0x8001
+global rlgl.ONE_MINUS_CONSTANT_COLOR <const> = 0x8002
+global rlgl.CONSTANT_ALPHA <const> = 0x8003
+global rlgl.ONE_MINUS_CONSTANT_ALPHA <const> = 0x8004
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- GL blending functions/equations
+global rlgl.FUNC_ADD <const> = 0x8006
+global rlgl.MIN <const> = 0x8007
+global rlgl.MAX <const> = 0x8008
+global rlgl.FUNC_SUBTRACT <const> = 0x800A
+global rlgl.FUNC_REVERSE_SUBTRACT <const> = 0x800B
+global rlgl.BLEND_EQUATION <const> = 0x8009
+global rlgl.BLEND_EQUATION_RGB <const> = 0x8009
+global rlgl.BLEND_EQUATION_ALPHA <const> = 0x883D
+global rlgl.BLEND_DST_RGB <const> = 0x80C8
+global rlgl.BLEND_SRC_RGB <const> = 0x80C9
+global rlgl.BLEND_DST_ALPHA <const> = 0x80CA
+global rlgl.BLEND_SRC_ALPHA <const> = 0x80CB
+global rlgl.BLEND_COLOR <const> = 0x8005
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Dynamic vertex buffers (position + texcoords + colors + indices arrays)
+global rlgl.vertexBuffer: type <cimport'rlVertexBuffer', cinclude'<rlgl.h>',nodecl> = @record{
+  elementCount: float32,
+  vertices: *float32,
+  texcoords: *float32,
+  colors: *cuchar,
+  indencies: *cuint,
+  vaoId: cuint,
+  vboId: [4]cuint
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--[[ rlDrawCall - Draw call type
+NOTE: Only texture changes register a new draw, other state-change-related elements are not
+used at this moment (vaoId, shaderId, matrices), raylib just forces a batch draw call if any
+of those state-change happens (this is done in core module) ]]
+global rlgl.drawCall: type <cimport'rlDrawCall', cinclude'<rlgl.h>',nodecl> = @record{
+  mode: cint,
+  vertexCount: cint,
+  vertexAlignment: cint,
+  textureId: cuint
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- rlRenderBatch type
+global rlgl.renderBatch: type <cimport'rlRenderBatch', cinclude'<rlgl.h>',nodecl> = @record{
+  bufferCount: cint,
+	currentBuffer: cint,
+	vertexBuffer: rlgl.vertexBuffer,
+	draws: rlgl.drawCall,
+	drawCounter: cint,
+	currentDepth: float32
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.glVersion: type <cimport'rlGlVersion', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  OPENGL_11 = 1,
+  OPENGL_21,
+  OPENGL_33,
+  OPENGL_43,
+  OPENGL_ES_20,
+  OPENGL_ES_30 
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.framebufferAttachType: type <cimport'rlFramebufferAttachType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  COLOR_CHANNEL0 = 0,
+  COLOR_CHANNEL1,
+  COLOR_CHANNEL2,
+  COLOR_CHANNEL3,
+  COLOR_CHANNEL4,
+  COLOR_CHANNEL5,
+  COLOR_CHANNEL6,
+  COLOR_CHANNEL7,
+  DEPTH = 100,
+  STENCIL = 200,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.framebufferAttachTextureType: type <cimport'rlFramebufferAttachTextureType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  CUBEMAP_POSITIVE_X = 0,
+  CUBEMAP_NEGATIVE_X,
+  CUBEMAP_POSITIVE_Y,
+  CUBEMAP_NEGATIVE_Y,
+  CUBEMAP_POSITIVE_Z,
+  CUBEMAP_NEGATIVE_Z,
+  TEXTURE2D = 100,
+  RENDERBUFFER = 200
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.cullMode: type <cimport'rlCullMode', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  FACE_FRONT = 0,
+  FACE_BACK
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- function rlgl.(): void <cimport'', cinclude'<rlgl.h>',nodecl> end
+
+--[[
+  global rlgl.: type <cimport'', cinclude'<rlgl.h>',nodecl> = @record{
+
+}
+]]
+
+-- Matrix Operations
+function rlgl.matrixMode(mode: cint): void <cimport'rlMatrixMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.pushMatrix(): void <cimport'rlPushMatrix', cinclude'<rlgl.h>',nodecl> end
+function rlgl.popMatrix(): void <cimport'rlPopMatrix', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadIdentity(): void <cimport'rlLoadIdentity', cinclude'<rlgl.h>',nodecl> end
+function rlgl.translatef(x: float32, y: float32, z: float32): void <cimport'', cinclude'<rlgl.h>',nodecl> end
+function rlgl.rotatef(angle: float32, x: float32, y: float32, z: float32): void <cimport'rlRotatef', cinclude'<rlgl.h>',nodecl> end
+function rlgl.scalef(x: float32, y: float32, z: float32): void <cimport'rlScalef', cinclude'<rlgl.h>',nodecl> end
+function rlgl.multMatrixf(matf: *float32): void <cimport'rlMultMatrixf', cinclude'<rlgl.h>',nodecl> end
+function rlgl.frustum(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): void <cimport'rlFrustum', cinclude'<rlgl.h>',nodecl> end
+function rlgl.ortho(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): void <cimport'rlOrtho', cinclude'<rlgl.h>',nodecl> end
+function rlgl.viewport(x: cint, y: cint, width: cint, height: cint): void <cimport'rlViewport', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Vertex level operations
+function rlgl.begin(mode: cint): void <cimport'rlBegin', cinclude'<rlgl.h>',nodecl> end
+function rlgl.ending(): void <cimport'rlEnd', cinclude'<rlgl.h>',nodecl> end
+function rlgl.vertex2i(x: cint, y: cint): void <cimport'rlVertex2i', cinclude'<rlgl.h>',nodecl> end
+function rlgl.vertex2f(x: float32, y: float32): void <cimport'rlVertex2f', cinclude'<rlgl.h>',nodecl> end
+function rlgl.vertex3f(x: float32, y: float32, z: float32): void <cimport'rlVertex3f', cinclude'<rlgl.h>',nodecl> end
+function rlgl.texCoord2f(x: float32, y: float32): void <cimport'rlTexCoord2f', cinclude'<rlgl.h>',nodecl> end
+function rlgl.normal3f(x: float32, y: float32, z: float32): void <cimport'rlNormal3f', cinclude'<rlgl.h>',nodecl> end
+function rlgl.color4ub(r: cuchar, g: cuchar, b: cuchar, a: cuchar): void <cimport'rlColor4ub', cinclude'<rlgl.h>',nodecl> end
+function rlgl.color3f(x: float32, y: float32, z: float32): void <cimport'rlColor3f', cinclude'<rlgl.h>',nodecl> end
+function rlgl.color4f(x: float32, y: float32, z: float32, w: float32): void <cimport'rlColor4f', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Functions Declaration - OpenGL style functions (common to 1.1, 3.3+, ES2)
+-- NOTE: This functions are used to completely abstract raylib code from OpenGL layer,
+-- some of them are direct wrappers over OpenGL calls, some others are custom
+
+-- Vertex buffers state
+function rlgl.enableVertexArray(vaoId: cuint): void <cimport'rlEnableVertexArray', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableVertexArray(): void <cimport'rlDisableVertexArray', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableVertexBuffer(id: cuint): void <cimport'rlEnableVertexBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableVertexBuffer(): void <cimport'rlDisableVertexBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableVertexBufferElement(id: cuint): void <cimport'rlEnableVertexBufferElement', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableVertexBufferElement(): void <cimport'rlDisableVertexBufferElement', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableVertexAttribute(index: cuint): void <cimport'rlEnableVertexAttribute', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableVertexAttribute(index: cuint): void <cimport'rlDisableVertexAttribute', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableStatePointer(vertexAttribType: cint, buffer: pointer): void <cimport'rlEnableStatePointer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableStatePointer(vertexAttribType: cint): void <cimport'rlDisableStatePointer', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Textures state
+function rlgl.activeTextureSlot(slot: cint): void <cimport'rlActiveTextureSlot', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableTexture(id: cuint): void <cimport'rlEnableTexture', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableTexture(): void <cimport'rlDisableTexture', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableTextureCubemap(id: cuint): void <cimport'rlEnableTextureCubemap', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableTextureCubemap(): void <cimport'rlDisableTextureCubemap', cinclude'<rlgl.h>',nodecl> end
+function rlgl.textureParameters(id: cuint, param: cint, value: cint): void <cimport'rlTextureParameters', cinclude'<rlgl.h>',nodecl> end
+function rlgl.cubemapParameters(id: cuint, param: cint, value: cint): void <cimport'rlCubemapParameters', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Shader state
+function rlgl.enableShader(id: cuint): void <cimport'rlEnableShader', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableShader(): void <cimport'rlDisableShader', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Framebuffer state
+function rlgl.enableFramebuffer(id: cuint): void <cimport'rlEnableFramebuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableFramebuffer(): void <cimport'rlDisableFramebuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.activeDrawBuffers(count: cint): void <cimport'rlActiveDrawBuffers', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- General render state
+function rlgl.enableColorBlend(): void <cimport'rlEnableColorBlend', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableColorBlend(): void <cimport'rlDisableColorBlend', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableDepthTest(): void <cimport'rlEnableDepthTest', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableDepthTest(): void <cimport'rlDisableDepthTest', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableDepthMask(): void <cimport'rlEnableDepthMask', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableDepthMask(): void <cimport'rlDisableDepthMask', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableBackfaceCulling(): void <cimport'rlEnableBackfaceCulling', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableBackfaceCulling(): void <cimport'rlDisableBackfaceCulling', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setCullFace(mode: cint): void <cimport'rlSetCullFace', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableScissorTest(): void <cimport'rlEnableScissorTest', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableScissorTest(): void <cimport'rlDisableScissorTest', cinclude'<rlgl.h>',nodecl> end
+function rlgl.scissor(x: cint, y: cint, width: cint, height: cint): void <cimport'rlScissor', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableWireMode(): void <cimport'rlEnableWireMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableWireMode(): void <cimport'rlDisableWireMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setLineWidth(width: float32): void <cimport'rlSetLineWidth', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getLineWidth(): float32 <cimport'rlGetLineWidth', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableSmoothLines(): void <cimport'rlEnableSmoothLines', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableSmoothLines(): void <cimport'rlDisableSmoothLines', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enableStereoRender(): void <cimport'rlEnableStereoRender', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disableStereoRender(): void <cimport'rlDisableStereoRender', cinclude'<rlgl.h>',nodecl> end
+function rlgl.isStereoRenderEnabled(): boolean <cimport'rlIsStereoRenderEnabled', cinclude'<rlgl.h>',nodecl> end
+function rlgl.clearColor(r: cuchar, g: cuchar, b: cuchar, a: cuchar): void <cimport'rlClearColor', cinclude'<rlgl.h>',nodecl> end
+function rlgl.clearScreenBuffers(): void <cimport'rlClearScreenBuffers', cinclude'<rlgl.h>',nodecl> end
+function rlgl.checkErrors(): void <cimport'rlCheckErrors', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setBlendMode(mode: cint): void <cimport'rlSetBlendMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setBlendFactors(glSrcFactor: cint, glDstFactor: cint, glEquation: cint): void <cimport'rlSetBlendFactors', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setBlendFactorsSeparate(glSrcRGB: cint, glDstRGB: cint, glSrcAlpha: cint, glDstAlpha: cint, glEqRGB: cint, glEqAlpha: cint): void <cimport'rlSetBlendFactorsSeparate', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Functions Declaration - rlgl functionality
+-- rlgl initialization functions
+function rlgl.init(width: cint, height: cint): void <cimport'rlglInit', cinclude'<rlgl.h>',nodecl> end
+function rlgl.close(): void <cimport'rlglClose', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadExtensions(loader: pointer): void <cimport'rlLoadExtensions', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getVersion(): cint <cimport'rlGetVersion', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setFramebufferWidth(width: cint): void <cimport'rlSetFramebufferWidth', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getFramebufferWidth(): cint <cimport'rlGetFramebufferWidth', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setFramebufferHeight(height: cint): void <cimport'rlSetFramebufferHeight', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getFramebufferHeight(): cint <cimport'rlGetFramebufferHeight', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getTextureIdDefault(): cuint <cimport'rlGetTextureIdDefault', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getShaderIdDefault(): cuint <cimport'rlGetShaderIdDefault', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getShaderLocsDefault(): cint <cimport'rlGetShaderLocsDefault', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Render batch management
+-- NOTE: rlgl provides a default render batch to behave like OpenGL 1.1 immediate mode
+-- but this render batch API is exposed in case of custom batches are required
+--function rlgl.LoadRenderBatch(numBuffers: cint, bufferElements: cint): rlgl.renderBatch <cimport'rlLoadRenderBatch', cinclude'<rlgl.h>',nodecl> end
+--function rlgl.unloadRenderBatch(batch: rlgl.renderBatch): void <cimport'rlUnloadRenderBatch', cinclude'<rlgl.h>',nodecl> end
+--function rlgl.drawRenderBatch(batch: *rlgl.renderBatch): void <cimport'rlDrawRenderBatch', cinclude'<rlgl.h>',nodecl> end
+--function rlgl.setRenderBatchActive(batch: *rlgl.renderBatch): void <cimport'rlSetRenderBatchActive', cinclude'<rlgl.h>',nodecl> end
+function rlgl.drawRenderBatchActive(): void <cimport'rlDrawRenderBatchActive', cinclude'<rlgl.h>',nodecl> end
+function rlgl.checkRenderBatchLimit(vCount: cint): boolean <cimport'rlCheckRenderBatchLimit', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setTexture(id: cuint): void <cimport'rlSetTexture', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Vertex buffers management
+function rlgl.loadVertexArray(): cuint <cimport'rlLoadVertexArray', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadVertexBuffer(buffer: pointer, size: cint, dynamic: boolean): cuint <cimport'rlLoadVertexBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadVertexBufferElement(buffer: pointer, size: cint, dynamic: boolean): cuint <cimport'rlLoadVertexBufferElement', cinclude'<rlgl.h>',nodecl> end
+function rlgl.updateVertexBuffer(bufferId: cuint, data: pointer, dataSize: cint, offset: cint): void <cimport'rlUpdateVertexBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.updateVertexBufferElements(id: cuint, data: pointer, dataSize: cint, offset: cint): void <cimport'rlUpdateVertexBufferElements', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadVertexArray(vaoId: cuint): void <cimport'rlUnloadVertexArray', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadVertexBuffer(vboId: cuint): void <cimport'rlUnloadVertexBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setVertexAttribute(index: cuint, compSize: cint, type: cint, normalized: boolean, stride: cint, pointer: pointer): void <cimport'rlSetVertexAttribute', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setVertexAttributeDivisor(index: cuint, divisor: cint): void <cimport'rlSetVertexAttributeDivisor', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setVertexAttributeDefault(locIndex: cint, value: pointer, attribType: cint, count: cint): void <cimport'rlSetVertexAttributeDefault', cinclude'<rlgl.h>',nodecl> end
+function rlgl.drawVertexArray(offset: cint, count: cint): void <cimport'rlDrawVertexArray', cinclude'<rlgl.h>',nodecl> end
+function rlgl.drawVertexArrayElements(offset: cint, count: cint, buffer: pointer): void <cimport'rlDrawVertexArrayElements', cinclude'<rlgl.h>',nodecl> end
+function rlgl.drawVertexArrayInstanced(offset: cint, count: cint, instances: cint): void <cimport'rlDrawVertexArrayInstanced', cinclude'<rlgl.h>',nodecl> end
+function rlgl.drawVertexArrayElementsInstanced(offset: cint, count: cint, buffer: pointer, instances: cint): void <cimport'rlDrawVertexArrayElementsInstanced', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Textures management
+function rlgl.loadTexture(data: pointer, width: cint, height: cint, format: cint, mipmapCount: cint): cuint <cimport'rlLoadTexture', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadTextureDepth(width: cint, height: cint, useRenderBuffer: boolean): cuint <cimport'rlLoadTextureDepth', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadTextureCubemap(data: pointer, size: cint, format: cint): cuint <cimport'rlLoadTextureCubemap', cinclude'<rlgl.h>',nodecl> end
+function rlgl.updateTexture(id: cuint, offsetX: cint, offsetY: cint, width: cint, height: cint, format: cint, data: pointer): void <cimport'rlUpdateTexture', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getGlTextureFormats(format: cint, glInternalFormat: *cuint, glFormat: *cuint, glType: *cuint): void <cimport'rlGetGlTextureFormats', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getPixelFormatName(format: cuint): cstring <cimport'rlGetPixelFormatName', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadTexture(id: cuint): void <cimport'rlUnloadTexture', cinclude'<rlgl.h>',nodecl> end
+function rlgl.genTextureMipmaps(id: cuint, width: cint, height: cint, format: cint, mipmaps: *cint): void <cimport'rlGenTextureMipmaps', cinclude'<rlgl.h>',nodecl> end
+function rlgl.readTexturePixels(id: cuint, width: cint, height: cint, format: cint): void <cimport'rlReadTexturePixels', cinclude'<rlgl.h>',nodecl> end
+function rlgl.readScreenPixels(width: cint, height: cint): cstring <cimport'rlReadScreenPixels', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Framebuffer management (fbo)
+function rlgl.loadFramebuffer(width: cint, height: cint): cuint <cimport'rlLoadFramebuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.framebufferAttach(fboId: cuint, texId: cuint, attachType: cint, texType: cint, mipLevel: cint): void <cimport'rlFramebufferAttach', cinclude'<rlgl.h>',nodecl> end
+function rlgl.framebufferComplete(id: cuint): boolean <cimport'rlFramebufferComplete', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadFramebuffer(id: cuint): void <cimport'rlUnloadFramebuffer', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Shaders management
+function rlgl.loadShaderCode(vsCode: cstring, fsCode: cstring): cuint <cimport'rlLoadShaderCode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.compileShader(shaderCode: cstring, type: cint): cuint <cimport'rlCompileShader', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadShaderProgram(vShaderId: cuint, fShaderId: cuint): cuint <cimport'rlLoadShaderProgram', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadShaderProgram(id: cuint): void <cimport'rlUnloadShaderProgram', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getLocationUniform(shaderId: cuint, uniformName: cstring): cint <cimport'rlGetLocationUniform', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getLocationAttrib(shaderId: cuint, attribName: cstring): cint <cimport'rlGetLocationAttrib', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setUniform(locIndex: cint, value: pointer, uniformType: cint, count: cint): void <cimport'rlSetUniform', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setUniformMatrix(locIndex: cint, mat: rl.matrix): void <cimport'rlSetUniformMatrix', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setUniformSampler(locIndex: cint, textureId: cuint): void <cimport'rlSetUniformSampler', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setShader(id: cuint, locs: *cint): void <cimport'rlSetShader', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Compute shader management
+function rlgl.loadComputeShaderProgram(shaderId: cuint): cuint <cimport'rlLoadComputeShaderProgram', cinclude'<rlgl.h>',nodecl> end
+function rlgl.computeShaderDispatch(groupX: cuint, groupY: cuint, groupZ: cuint): void <cimport'rlComputeShaderDispatch', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Shader buffer storage object management (ssbo)
+function rlgl.loadShaderBuffer(size: cuint, data: pointer, usageHint: cint): cuint <cimport'rlLoadShaderBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadShaderBuffer(ssboId: cuint): void <cimport'rlUnloadShaderBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.updateShaderBuffer(id: cuint, data: pointer, dataSize: cuint, offset: cuint): void <cimport'rlUpdateShaderBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.bindShaderBuffer(id: cuint, index: cuint): void <cimport'rlBindShaderBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.readShaderBuffer(id: cuint, dest: pointer, count: cuint, offset: cuint): void <cimport'rlReadShaderBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.copyShaderBuffer(destId: cuint, srcId: cuint, destOffset: cuint, srcOffset: cuint, count: cuint): void <cimport'rlCopyShaderBuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getShaderBufferSize(id: cuint): cuint <cimport'rlGetShaderBufferSize', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Buffer management
+function rlgl.bindImageTexture(id: cuint, index: cuint, format: cint, readonly: boolean): void <cimport'rlBindImageTexture', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Matrix state management
+function rlgl.getMatrixModelview(): rl.matrix <cimport'rlGetMatrixModelview', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getMatrixProjection(): rl.matrix <cimport'rlGetMatrixProjection', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getMatrixTransform(): rl.matrix <cimport'rlGetMatrixTransform', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getMatrixProjectionStereo(eye: cint): rl.matrix <cimport'rlGetMatrixProjectionStereo', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getMatrixViewOffsetStereo(eye: cint): rl.matrix <cimport'rlGetMatrixViewOffsetStereo', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setMatrixProjection(proj: rl.matrix): void <cimport'rlSetMatrixProjection', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setMatrixModelview(view: rl.matrix): void <cimport'rlSetMatrixModelview', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setMatrixProjectionStereo(right: rl.matrix, left: rl.matrix): void <cimport'rlSetMatrixProjectionStereo', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setMatrixViewOffsetStereo(right: rl.matrix, left: rl.matrix): void <cimport'rlSetMatrixViewOffsetStereo', cinclude'<rlgl.h>',nodecl> end
+
+-- Quick and dirty cube/quad buffers load->draw->unload
+function rlgl.loadDrawCube(): void <cimport'rlLoadDrawCube', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadDrawQuad(): void <cimport'rlLoadDrawQuad', cinclude'<rlgl.h>',nodecl> end
+
+--------------------------------------------------------------------------------------------------------------------------

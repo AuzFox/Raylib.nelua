@@ -41,6 +41,7 @@ MyCodeFolder:
           --> raylib.nelua
           --> rayeasings.nelua (optional)
           --> rcamera.nelua (optional)
+          --> rlgl.nelua (optional)
 ```
 
 
