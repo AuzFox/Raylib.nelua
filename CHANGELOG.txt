@@ -1,6 +1,10 @@
+26/06/2023:
+- Add raygui binding
+
 24/06/2023:
 - RLGL: Change rlgl.renderBatch properties vertexBuffer and draws to unbound array
 - Add missing rlgl.translatef() cimport
+- Add missing function rl.setWindowIcons()
 
 24/06/2023:
 - Binding for RLGL - Not to be used as standalone for now. It calls Raylib.nelua

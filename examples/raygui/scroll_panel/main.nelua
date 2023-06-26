@@ -1,0 +1,118 @@
+require "raylib"
+require "raygui"
+require "rlgl"
+
+-- Initialization
+--------------------------------------------------------------------------------------
+local SCREEN_WIDTH <const> = 800
+local SCREEN_HEIGHT <const> = 450
+
+rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "raygui.nelua - Scroll Panel")
+
+rl.setTargetFPS(60)
+
+local panelRec = rl.rectangle{ x = 20, y = 40, width = 200, height = 150 }
+local panelContentRec = rl.rectangle{ x = 0, y = 0, width = 340, height = 340 }
+local panelView = rl.rectangle{}
+local panelScroll = rl.vector2{ x = 99, y = -20 }
+local showContentArea = true
+---------------------------------------------------------------------------------------
+
+-- Draw and process scroll bar style edition controls
+local function drawStyleEditControls()
+
+  local style: int32
+  
+  -- ScrollPanel style controls
+  rlgui.groupBox(rl.rectangle{ x = 550, y = 170, width = 220, height = 205 }, "SCROLLBAR STYLE")
+
+  style = rlgui.getStyle(rlgui.control.SCROLLBAR, rlgui.controlProperty.BORDER_WIDTH)
+  rlgui.label(rl.rectangle{ x = 555, y = 195, width = 110, height = 10 }, "BORDER_WIDTH")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 190, width = 90, height = 20 }, "", &style, 0, 6, false)
+  rlgui.setStyle(rlgui.control.SCROLLBAR, rlgui.controlProperty.BORDER_WIDTH, style)
+
+  style = rlgui.getStyle(rlgui.control.SCROLLBAR, rlgui.scrollBarProperty.ARROWS_SIZE)
+  rlgui.label(rl.rectangle{ x = 555, y = 220, width = 110, height = 10 }, "ARROWS_SIZE")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 215, width = 90, height = 20 }, "", &style, 4, 14, false)
+  rlgui.setStyle(rlgui.control.SCROLLBAR, rlgui.scrollBarProperty.ARROWS_SIZE, style)
+
+  style = rlgui.getStyle(rlgui.control.SCROLLBAR, rlgui.sliderProperty.SLIDER_PADDING)
+  rlgui.label(rl.rectangle{ x = 555, y = 245, width = 110, height = 10 }, "SLIDER_PADDING")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 240, width = 90, height = 20 }, "", &style, 0, 14, false)
+  rlgui.setStyle(rlgui.control.SCROLLBAR, rlgui.sliderProperty.SLIDER_PADDING, style)
+
+  local scrollBarArrows = rlgui.getStyleAsBool(rlgui.control.SCROLLBAR, rlgui.scrollBarProperty.ARROWS_VISIBLE)
+  rlgui.checkBox(rl.rectangle{ 565, 280, 20, 20 }, "ARROWS_VISIBLE", &scrollBarArrows)
+  rlgui.setStyle(rlgui.control.SCROLLBAR, rlgui.scrollBarProperty.ARROWS_VISIBLE, rlgui.boolToInt(scrollBarArrows))
+
+  style = rlgui.getStyle(rlgui.control.SCROLLBAR, rlgui.sliderProperty.SLIDER_PADDING)
+  rlgui.label(rl.rectangle{ x = 555, y = 325, width = 110, height = 10 }, "SLIDER_PADDING")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 320, width = 90, height = 20 }, "", &style, 0, 14, false)
+  rlgui.setStyle(rlgui.control.SCROLLBAR, rlgui.sliderProperty.SLIDER_PADDING, style)
+
+  style = rlgui.getStyle(rlgui.control.SCROLLBAR, rlgui.sliderProperty.SLIDER_WIDTH)
+  rlgui.label(rl.rectangle{ x = 555, y = 350, width = 110, height = 10 }, "SLIDER_WIDTH")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 345, width = 90, height = 20 }, "", &style, 2, 100, false)
+  rlgui.setStyle(rlgui.control.SCROLLBAR, rlgui.sliderProperty.SLIDER_WIDTH, style)
+
+  local text = rlgui.getStyle(rlgui.control.LISTVIEW, rlgui.listViewProperty.SCROLLBAR_SIDE) == rlgui.SCROLLBAR_LEFT_SIDE and "SCROLLBAR: LEFT" or "SCROLLBAR: RIGHT"
+  local toggleScrollBarSide = rlgui.getStyle(rlgui.control.LISTVIEW, rlgui.listViewProperty.SCROLLBAR_SIDE)
+  rlgui.toggle(rl.rectangle{ x = 560, y = 110, width = 200, height = 35 }, text, &toggleScrollBarSide)
+  rlgui.setStyle(rlgui.control.LISTVIEW, rlgui.listViewProperty.SCROLLBAR_SIDE, toggleScrollBarSide)
+  ----------------------------------------------------------
+
+  -- ScrollBar style controls
+  rlgui.groupBox(rl.rectangle{ x = 550, y = 20, width = 220, height = 135 }, "SCROLLPANEL STYLE")
+
+  style = rlgui.getStyle(rlgui.control.LISTVIEW, rlgui.listViewProperty.SCROLLBAR_WIDTH)
+  rlgui.label(rl.rectangle{ x = 555, y = 35, width = 110, height = 10 }, "SCROLLBAR_WIDTH")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 30, width = 90, height = 20 }, "", &style, 6, 30, false)
+  rlgui.setStyle(rlgui.control.LISTVIEW, rlgui.listViewProperty.SCROLLBAR_WIDTH, style)
+
+  style = rlgui.getStyle(DEFAULT, rlgui.controlProperty.BORDER_WIDTH)
+  rlgui.label(rl.rectangle{ x = 555, y = 60, width = 110, height = 10 }, "BORDER_WIDTH")
+  rlgui.spinner(rl.rectangle{ x = 670, y = 55, width = 90, height = 20 }, "", &style, 0, 20, false)
+  rlgui.setStyle(DEFAULT, rlgui.controlProperty.BORDER_WIDTH, style)
+  ----------------------------------------------------------
+end
+
+-- Main game loop
+while not rl.windowShouldClose() do
+    -- Update
+    ----------------------------------------------------------------------------------
+    -- TODO: Implement required update logic
+    ----------------------------------------------------------------------------------
+
+    -- Draw
+    ----------------------------------------------------------------------------------
+    rl.beginDrawing()
+
+    rl.clearBackground(rl.RAYWHITE)
+
+    rl.drawText(string.format("[%f, %f]", panelScroll.x, panelScroll.y), 4, 4, 20, rl.RED)
+
+    rlgui.scrollPanel(panelRec, "", panelContentRec, panelScroll, panelView)
+
+    rl.beginScissorMode(panelView.x, panelView.y, panelView.width, panelView.height)
+    rlgui.grid(rl.rectangle{ x = panelRec.x + panelScroll.x, y = panelRec.y + panelScroll.y, width = panelContentRec.width, height = panelContentRec.height }, "", 16, 3, rl.vector2{})
+    rl.endScissorMode()
+
+    if showContentArea then
+        rl.drawRectangle(panelRec.x + panelScroll.x, panelRec.y + panelScroll.y, panelContentRec.width, panelContentRec.height, rl.fade(rl.RED, 0.1))
+    end
+
+    drawStyleEditControls()
+
+    rlgui.checkBox(rl.rectangle{ x = 565, y = 80, width = 20, height = 20 }, "SHOW CONTENT AREA", &showContentArea)
+
+    rlgui.sliderBar(rl.rectangle{ x = 590, y = 385, width = 145, height = 15 }, "WIDTH", string.format("%0.f", panelContentRec.width), &panelContentRec.width, 1, 600)
+    rlgui.sliderBar(rl.rectangle{ x = 590, y = 410, width = 145, height = 15 }, "HEIGHT", string.format("%0.f", panelContentRec.height), &panelContentRec.height, 1, 400)
+
+    rl.endDrawing()
+    ----------------------------------------------------------------------------------
+end
+
+-- De-Initialization
+--------------------------------------------------------------------------------------
+rl.closeWindow() -- Close window and OpenGL context
+--------------------------------------------------------------------------------------

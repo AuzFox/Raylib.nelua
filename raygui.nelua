@@ -1,0 +1,576 @@
+require 'raylib'
+
+##[[ 
+  cinclude "raygui.h" 
+  linklib "raygui"
+]]
+
+-- Constants
+--------------------------------------------------------------------------------------------------------------------------
+global rlgui = @record{}
+
+global rlgui.VERSION_MAJOR <const> = 4
+global rlgui.VERSION_MINOR <const> = 0
+global rlgui.VERSION_PATCH <const> = 0
+global rlgui.VERSION <const> = "4.0-dev"
+
+global rlgui.SCROLLBAR_LEFT_SIDE = 0
+global rlgui.SCROLLBAR_RIGHT_SIDE = 0
+
+
+--------------------------------------------------------------------------------------------------------------------------
+-- Global gui state control functions
+function rlgui.enable(): void <cimport'GuiEnable', cinclude'<raygui.h>',nodecl> end
+function rlgui.disable(): void <cimport'GuiDisable', cinclude'<raygui.h>',nodecl> end
+function rlgui.lock(): void <cimport'GuiLock', cinclude'<raygui.h>',nodecl> end
+function rlgui.unlock(): void <cimport'GuiUnlock', cinclude'<raygui.h>',nodecl> end
+function rlgui.isLocked(): boolean <cimport'GuiIsLocked', cinclude'<raygui.h>',nodecl> end
+function rlgui.fade(alpha: float32): void <cimport'GuiFade', cinclude'<raygui.h>',nodecl> end
+function rlgui.setState(state: cint): void <cimport'GuiSetState', cinclude'<raygui.h>',nodecl> end
+function rlgui.getState(): cint <cimport'GuiGetState', cinclude'<raygui.h>',nodecl> end
+
+-- Font set/get functions
+function rlgui.setFont(font: rl.font): void <cimport'GuiSetFont', cinclude'<raygui.h>',nodecl> end
+function rlgui.getFont(): rl.font <cimport'GuiGetFont', cinclude'<raygui.h>',nodecl> end
+
+-- Style set/get functions
+function rlgui.setStyle(control: cint, property: cint, value: cint): void <cimport'GuiSetStyle', cinclude'<raygui.h>',nodecl> end
+function rlgui.getStyle(control: cint, property: cint): cint <cimport'GuiGetStyle', cinclude'<raygui.h>',nodecl> end
+function rlgui.getStyleAsBool(control: cint, property: cint): boolean <cimport'GuiGetStyle', cinclude'<raygui.h>',nodecl> end
+
+-- Styles loading functions
+function rlgui.loadStyle(fileName: cstring): void <cimport'GuiLoadStyle', cinclude'<raygui.h>',nodecl> end
+function rlgui.loadStyleDefault(): void <cimport'GuiLoadStyleDefault', cinclude'<raygui.h>',nodecl> end
+
+-- Tooltips management functions
+function rlgui.enableTooltip(): void <cimport'GuiEnableTooltip', cinclude'<raygui.h>',nodecl> end
+function rlgui.disableTooltip(): void <cimport'GuiDisableTooltip', cinclude'<raygui.h>',nodecl> end
+function rlgui.setTooltip(tooltip: cstring): void <cimport'GuiSetTooltip', cinclude'<raygui.h>',nodecl> end
+
+-- Icons functionality
+function rlgui.iconText(iconId: cint, text: cstring): cstring <cimport'GuiIconText', cinclude'<raygui.h>',nodecl> end
+--------------------------------------------------------------------------------------------------------------------------
+-- Types and Structures Definition
+
+-- Style property
+global rlgui.styleProp: type <cimport'GuiStyleProp', cinclude'<raygui.h>',nodecl> = @record{
+  controlId: cushort,
+  propertyId: cushort,
+  propertyValue: cuint
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Gui control state
+global rlgui.state: type <cimport'GuiState', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  STATE_NORMAL = 0,
+  STATE_FOCUSED,
+  STATE_PRESSED,
+  STATE_DISABLED,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Gui control text alignment
+global rlgui.textAlignment: type <cimport'GuiTextAlignment', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  TEXT_LEFT = 0,
+  TEXT_CENTER,
+  TEXT_RIGHT,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Gui controls
+global rlgui.control: type <cimport'GuiControl', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  DEFAULT = 0,
+  LABEL,
+  BUTTON,
+  TOGGLE,
+  SLIDER,
+  PROGRESSBAR,
+  CHECKBOX,
+  COMBOBOX,
+  DROPDOWNBOX,
+  TEXTBOX,
+  VALUEBOX,
+  SPINNER,
+  LISTVIEW,
+  COLORPICKER,
+  SCROLLBAR,
+  STATUSBAR
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--[[
+  Gui base properties for every control
+  NOTE: RAYGUI_MAX_PROPS_BASE properties (by default 16 properties)
+]]
+global rlgui.controlProperty: type <cimport'GuiControlProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  BORDER_COLOR_NORMAL = 0,
+  BASE_COLOR_NORMAL,
+  TEXT_COLOR_NORMAL,
+  BORDER_COLOR_FOCUSED,
+  BASE_COLOR_FOCUSED,
+  TEXT_COLOR_FOCUSED,
+  BORDER_COLOR_PRESSED,
+  BASE_COLOR_PRESSED,
+  TEXT_COLOR_PRESSED,
+  BORDER_COLOR_DISABLED,
+  BASE_COLOR_DISABLED,
+  TEXT_COLOR_DISABLED,
+  BORDER_WIDTH,
+  TEXT_PADDING,
+  TEXT_ALIGNMENT,
+  RESERVED
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--[[
+DEFAULT extended properties
+NOTE: Those properties are common to all controls or global
+]]
+global rlgui.defaultProperty: type <cimport'GuiDefaultProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  TEXT_SIZE = 16,
+  TEXT_SPACING,
+  LINE_COLOR,
+  BACKGROUND_COLOR,
+  TEXT_LINE_SPACING
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Toggle/ToggleGroup
+global rlgui.toggleProperty: type <cimport'GuiToggleProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  GROUP_PADDING = 16,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- Slider/SliderBar
+global rlgui.sliderProperty: type <cimport'GuiSliderProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  SLIDER_WIDTH = 16,
+  SLIDER_PADDING 
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- ProgressBar
+global rlgui.progressBarProperty: type <cimport'GuiProgressBarProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  PROGRESS_PADDING = 16,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- ScrollBar
+global rlgui.scrollBarProperty: type <cimport'GuiScrollBarProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  ARROWS_SIZE = 16,
+  ARROWS_VISIBLE,
+  SCROLL_SLIDER_PADDING,
+  SCROLL_SLIDER_SIZE,
+  SCROLL_PADDING,
+  SCROLL_SPEED,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--  CheckBox
+global rlgui.checkBoxProperty: type <cimport'GuiCheckBoxProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  CHECK_PADDING = 16 
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--  ComboBox
+global rlgui.comboBoxProperty: type <cimport'GuiComboBoxProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  COMBO_BUTTON_WIDTH = 16,
+  COMBO_BUTTON_SPACING
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--  DropdownBox
+global rlgui.dropdownBoxProperty: type <cimport'GuiDropdownBoxProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  ARROW_PADDING = 16,
+  DROPDOWN_ITEMS_SPACING
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- TextBox/TextBoxMulti/ValueBox/Spinner
+global rlgui.textBoxProperty: type <cimport'GuiTextBoxProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  TEXT_INNER_PADDING = 16,
+  TEXT_LINES_SPACING,
+  TEXT_ALIGNMENT_VERTICAL,
+  TEXT_MULTILINE,
+  TEXT_WRAP_MODE
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--  Spinner
+global rlgui.spinnerProperty: type <cimport'GuiSpinnerProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  SPIN_BUTTON_WIDTH = 16,
+  SPIN_BUTTON_SPACING,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--  ListView
+global rlgui.listViewProperty: type <cimport'GuiListViewProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  LIST_ITEMS_HEIGHT = 16,
+  LIST_ITEMS_SPACING,
+  SCROLLBAR_WIDTH,
+  SCROLLBAR_SIDE,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+--  ColorPicker
+global rlgui.colorPickerProperty: type <cimport'GuiColorPickerProperty', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  COLOR_SELECTOR_SIZE = 16,
+  HUEBAR_WIDTH,
+  HUEBAR_PADDING,
+  HUEBAR_SELECTOR_HEIGHT,
+  HUEBAR_SELECTOR_OVERFLOW
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+-- Module Function Decleration
+
+-- Controls/Seperator controls
+function rlgui.windowBox(bounds: rl.rectangle, title: cstring): cint <cimport'GuiWindowBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.groupBox(bounds: rl.rectangle, title: cstring): cint <cimport'GuiGroupBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.line(bounds: rl.rectangle, title: cstring): cint <cimport'GuiLine', cinclude'<raygui.h>',nodecl> end
+function rlgui.panel(bounds: rl.rectangle, title: cstring): cint <cimport'GuiPanel', cinclude'<raygui.h>',nodecl> end
+function rlgui.tabBar(bounds: rl.rectangle, text: *cstring, count: cint, active: *cint): cint <cimport'GuiTabBar', cinclude'<raygui.h>',nodecl> end
+function rlgui.scrollPanel(bounds: rl.rectangle, text: cstring, content: rl.rectangle, scroll: *rl.vector2, view: *rl.rectangle): cint <cimport'GuiScrollPanel', cinclude'<raygui.h>',nodecl> end
+
+-- Basic control sets
+function rlgui.label(bounds: rl.rectangle, text: cstring): cint <cimport'GuiLabel', cinclude'<raygui.h>',nodecl> end
+function rlgui.button(bounds: rl.rectangle, text: cstring): cint <cimport'GuiButton', cinclude'<raygui.h>',nodecl> end
+function rlgui.labelButton(bounds: rl.rectangle, text: cstring): cint <cimport'GuiLabelButton', cinclude'<raygui.h>',nodecl> end
+function rlgui.toggle(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiToggle', cinclude'<raygui.h>',nodecl> end
+function rlgui.toggleGroup(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiToggleGroup', cinclude'<raygui.h>',nodecl> end
+function rlgui.checkBox(bounds: rl.rectangle, text: cstring, checked: *boolean): cint <cimport'GuiCheckBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.comboBox(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiComboBox', cinclude'<raygui.h>',nodecl> end
+
+function rlgui.dropdownBox(bounds: rl.rectangle, text: cstring, active: *cint, editMode: boolean): cint <cimport'GuiDropdownBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.spinner(bounds: rl.rectangle, text: cstring, value: *cint, minValue: cint, maxValue: cint, editMode: boolean): cint <cimport'GuiSpinner', cinclude'<raygui.h>',nodecl> end
+function rlgui.valueBox(bounds: rl.rectangle, text: cstring, value: *cint, minValue: cint, maxValue: cint, editMode: boolean): cint <cimport'GuiValueBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.textBox(bounds: rl.rectangle, text: cchar, textSize: cint, editMode: boolean): cint <cimport'GuiTextBox', cinclude'<raygui.h>',nodecl> end
+
+function rlgui.slider(bounds: rl.rectangle, textLeft: cstring, textRight: cstring, value: *float32, minValue: float32, maxValue: float32): cint <cimport'GuiSlider', cinclude'<raygui.h>',nodecl> end
+function rlgui.sliderBar(bounds: rl.rectangle, textLeft: cstring, textRight: cstring, value: *float32, minValue: float32, maxValue: float32): cint <cimport'GuiSliderBar', cinclude'<raygui.h>',nodecl> end
+function rlgui.progressBar(bounds: rl.rectangle, textLeft: cstring, textRight: cstring, value: *float32, minValue: float32, maxValue: float32): cint <cimport'GuiProgressBar', cinclude'<raygui.h>',nodecl> end
+function rlgui.statusBar(bounds: rl.rectangle, text: cstring): cint <cimport'GuiStatusBar', cinclude'<raygui.h>',nodecl> end
+function rlgui.dummyRec(bounds: rl.rectangle, text: cstring): cint <cimport'GuiDummyRec', cinclude'<raygui.h>',nodecl> end
+function rlgui.grid(bounds: rl.rectangle, text: cstring, spacing: float32, subdivs: cint, mouseCell: *rl.vector2): cint <cimport'GuiGrid', cinclude'<raygui.h>',nodecl> end
+
+-- Advance controls set
+function rlgui.listView(bounds: rl.rectangle, text: cstring, scrollIndex: *cint, active: *cint): cint <cimport'GuiListView', cinclude'<raygui.h>',nodecl> end
+function rlgui.listViewEx(bounds: rl.rectangle, text: *cstring, count: cint, scrollIndex: *cint, active: *cint, focus: *cint): cint <cimport'GuiListViewEx', cinclude'<raygui.h>',nodecl> end
+function rlgui.messageBox(bounds: rl.rectangle, title: cstring, message: cstring, buttons: cstring): cint <cimport'GuiMessageBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.textInputBox(bounds: rl.rectangle, title: cstring, message: cstring, buttons: cstring, text: cchar, textMaxSize: cint, secretViewActive: *boolean): cint <cimport'GuiTextInputBox', cinclude'<raygui.h>',nodecl> end
+function rlgui.colorPicker(bounds: rl.rectangle, text: cstring, color: *rl.color): cint <cimport'GuiColorPicker', cinclude'<raygui.h>',nodecl> end
+function rlgui.colorPanel(bounds: rl.rectangle, text: cstring, color: *rl.color): cint <cimport'GuiColorPanel', cinclude'<raygui.h>',nodecl> end
+function rlgui.colorBarAlpha(bounds: rl.rectangle, text: cstring, alpha: *float32): cint <cimport'GuiColorBarAlpha', cinclude'<raygui.h>',nodecl> end
+function rlgui.colorBarHue(bounds: rl.rectangle, text: cstring, value: *float32): cint <cimport'GuiColorBarHue', cinclude'<raygui.h>',nodecl> end
+function rlgui.colorPickerHSV(bounds: rl.rectangle, text: cstring, colorHsv: *rl.vector3): cint <cimport'GuiColorPickerHSV', cinclude'<raygui.h>',nodecl> end
+function rlgui.colorPanelHSV(bounds: rl.rectangle, text: cstring, colorHsv: *rl.vector3): cint <cimport'GuiColorPanelHSV', cinclude'<raygui.h>',nodecl> end
+
+function rlgui.boolToInt(b: boolean): cint
+  if b then
+    return 1
+  else
+    return 0
+  end
+end
+
+function rlgui.boolToIntPtr(b: boolean): *cint
+  local num: cint
+
+  if b then
+    num = (@cint)(1)
+  else
+    num = (@cint)(0)
+  end
+
+  return &num
+end
+
+
+function rlgui.intToBool(v: cint): boolean
+  return 0 < v
+end
+
+--------------------------------------------------------------------------------------------------------------------------
+-- Icon Enumeration
+global rlgui.iconName: type <cimport'GuiIconName', cinclude'<raygui.h>',nodecl,using> = @enum(cint){
+  NONE                     = 0,
+  FOLDER_FILE_OPEN         = 1,
+  FILE_SAVE_CLASSIC        = 2,
+  FOLDER_OPEN              = 3,
+  FOLDER_SAVE              = 4,
+  FILE_OPEN                = 5,
+  FILE_SAVE                = 6,
+  FILE_EXPORT              = 7,
+  FILE_ADD                 = 8,
+  FILE_DELETE              = 9,
+  FILETYPE_TEXT            = 10,
+  FILETYPE_AUDIO           = 11,
+  FILETYPE_IMAGE           = 12,
+  FILETYPE_PLAY            = 13,
+  FILETYPE_VIDEO           = 14,
+  FILETYPE_INFO            = 15,
+  FILE_COPY                = 16,
+  FILE_CUT                 = 17,
+  FILE_PASTE               = 18,
+  CURSOR_HAND              = 19,
+  CURSOR_POINTER           = 20,
+  CURSOR_CLASSIC           = 21,
+  PENCIL                   = 22,
+  PENCIL_BIG               = 23,
+  BRUSH_CLASSIC            = 24,
+  BRUSH_PAINTER            = 25,
+  WATER_DROP               = 26,
+  COLOR_PICKER             = 27,
+  RUBBER                   = 28,
+  COLOR_BUCKET             = 29,
+  TEXT_T                   = 30,
+  TEXT_A                   = 31,
+  SCALE                    = 32,
+  RESIZE                   = 33,
+  FILTER_POINT             = 34,
+  FILTER_BILINEAR          = 35,
+  CROP                     = 36,
+  CROP_ALPHA               = 37,
+  SQUARE_TOGGLE            = 38,
+  SYMMETRY                 = 39,
+  SYMMETRY_HORIZONTAL      = 40,
+  SYMMETRY_VERTICAL        = 41,
+  LENS                     = 42,
+  LENS_BIG                 = 43,
+  EYE_ON                   = 44,
+  EYE_OFF                  = 45,
+  FILTER_TOP               = 46,
+  FILTER                   = 47,
+  TARGET_POINT             = 48,
+  TARGET_SMALL             = 49,
+  TARGET_BIG               = 50,
+  TARGET_MOVE              = 51,
+  CURSOR_MOVE              = 52,
+  CURSOR_SCALE             = 53,
+  CURSOR_SCALE_RIGHT       = 54,
+  CURSOR_SCALE_LEFT        = 55,
+  UNDO                     = 56,
+  REDO                     = 57,
+  REREDO                   = 58,
+  MUTATE                   = 59,
+  ROTATE                   = 60,
+  REPEAT                   = 61,
+  SHUFFLE                  = 62,
+  EMPTYBOX                 = 63,
+  TARGET                   = 64,
+  TARGET_SMALL_FILL        = 65,
+  TARGET_BIG_FILL          = 66,
+  TARGET_MOVE_FILL         = 67,
+  CURSOR_MOVE_FILL         = 68,
+  CURSOR_SCALE_FILL        = 69,
+  CURSOR_SCALE_RIGHT_FILL  = 70,
+  CURSOR_SCALE_LEFT_FILL   = 71,
+  UNDO_FILL                = 72,
+  REDO_FILL                = 73,
+  REREDO_FILL              = 74,
+  MUTATE_FILL              = 75,
+  ROTATE_FILL              = 76,
+  REPEAT_FILL              = 77,
+  SHUFFLE_FILL             = 78,
+  EMPTYBOX_SMALL           = 79,
+  BOX                      = 80,
+  BOX_TOP                  = 81,
+  BOX_TOP_RIGHT            = 82,
+  BOX_RIGHT                = 83,
+  BOX_BOTTOM_RIGHT         = 84,
+  BOX_BOTTOM               = 85,
+  BOX_BOTTOM_LEFT          = 86,
+  BOX_LEFT                 = 87,
+  BOX_TOP_LEFT             = 88,
+  BOX_CENTER               = 89,
+  BOX_CIRCLE_MASK          = 90,
+  POT                      = 91,
+  ALPHA_MULTIPLY           = 92,
+  ALPHA_CLEAR              = 93,
+  DITHERING                = 94,
+  MIPMAPS                  = 95,
+  BOX_GRID                 = 96,
+  GRID                     = 97,
+  BOX_CORNERS_SMALL        = 98,
+  BOX_CORNERS_BIG          = 99,
+  FOUR_BOXES               = 100,
+  GRID_FILL                = 101,
+  BOX_MULTISIZE            = 102,
+  ZOOM_SMALL               = 103,
+  ZOOM_MEDIUM              = 104,
+  ZOOM_BIG                 = 105,
+  ZOOM_ALL                 = 106,
+  ZOOM_CENTER              = 107,
+  BOX_DOTS_SMALL           = 108,
+  BOX_DOTS_BIG             = 109,
+  BOX_CONCENTRIC           = 110,
+  BOX_GRID_BIG             = 111,
+  OK_TICK                  = 112,
+  CROSS                    = 113,
+  ARROW_LEFT               = 114,
+  ARROW_RIGHT              = 115,
+  ARROW_DOWN               = 116,
+  ARROW_UP                 = 117,
+  ARROW_LEFT_FILL          = 118,
+  ARROW_RIGHT_FILL         = 119,
+  ARROW_DOWN_FILL          = 120,
+  ARROW_UP_FILL            = 121,
+  AUDIO                    = 122,
+  FX                       = 123,
+  WAVE                     = 124,
+  WAVE_SINUS               = 125,
+  WAVE_SQUARE              = 126,
+  WAVE_TRIANGULAR          = 127,
+  CROSS_SMALL              = 128,
+  PLAYER_PREVIOUS          = 129,
+  PLAYER_PLAY_BACK         = 130,
+  PLAYER_PLAY              = 131,
+  PLAYER_PAUSE             = 132,
+  PLAYER_STOP              = 133,
+  PLAYER_NEXT              = 134,
+  PLAYER_RECORD            = 135,
+  MAGNET                   = 136,
+  LOCK_CLOSE               = 137,
+  LOCK_OPEN                = 138,
+  CLOCK                    = 139,
+  TOOLS                    = 140,
+  GEAR                     = 141,
+  GEAR_BIG                 = 142,
+  BIN                      = 143,
+  HAND_POINTER             = 144,
+  LASER                    = 145,
+  COIN                     = 146,
+  EXPLOSION                = 147,
+  I1UP                     = 148,
+  PLAYER                   = 149,
+  PLAYER_JUMP              = 150,
+  KEY                      = 151,
+  DEMON                    = 152,
+  TEXT_POPUP               = 153,
+  GEAR_EX                  = 154,
+  CRACK                    = 155,
+  CRACK_POINTS             = 156,
+  STAR                     = 157,
+  DOOR                     = 158,
+  EXIT                     = 159,
+  MODE_2D                  = 160,
+  MODE_3D                  = 161,
+  CUBE                     = 162,
+  CUBE_FACE_TOP            = 163,
+  CUBE_FACE_LEFT           = 164,
+  CUBE_FACE_FRONT          = 165,
+  CUBE_FACE_BOTTOM         = 166,
+  CUBE_FACE_RIGHT          = 167,
+  CUBE_FACE_BACK           = 168,
+  CAMERA                   = 169,
+  SPECIAL                  = 170,
+  LINK_NET                 = 171,
+  LINK_BOXES               = 172,
+  LINK_MULTI               = 173,
+  LINK                     = 174,
+  LINK_BROKE               = 175,
+  TEXT_NOTES               = 176,
+  NOTEBOOK                 = 177,
+  SUITCASE                 = 178,
+  SUITCASE_ZIP             = 179,
+  MAILBOX                  = 180,
+  MONITOR                  = 181,
+  PRINTER                  = 182,
+  PHOTO_CAMERA             = 183,
+  PHOTO_CAMERA_FLASH       = 184,
+  HOUSE                    = 185,
+  HEART                    = 186,
+  CORNER                   = 187,
+  VERTICAL_BARS            = 188,
+  VERTICAL_BARS_FILL       = 189,
+  LIFE_BARS                = 190,
+  INFO                     = 191,
+  CROSSLINE                = 192,
+  HELP                     = 193,
+  FILETYPE_ALPHA           = 194,
+  FILETYPE_HOME            = 195,
+  LAYERS_VISIBLE           = 196,
+  LAYERS                   = 197,
+  WINDOW                   = 198,
+  HIDPI                    = 199,
+  FILETYPE_BINARY          = 200,
+  HEX                      = 201,
+  SHIELD                   = 202,
+  FILE_NEW                 = 203,
+  FOLDER_ADD               = 204,
+  ALARM                    = 205,
+  CPU                      = 206,
+  ROM                      = 207,
+  STEP_OVER                = 208,
+  STEP_INTO                = 209,
+  STEP_OUT                 = 210,
+  RESTART                  = 211,
+  BREAKPOINT_ON            = 212,
+  BREAKPOINT_OFF           = 213,
+  BURGER_MENU              = 214,
+  CASE_SENSITIVE           = 215,
+  REG_EXP                  = 216,
+  FOLDER                   = 217,
+  FILE                     = 218,
+  SAND_TIMER               = 219,
+  ICON_220                      = 220,
+  ICON_221                      = 221,
+  ICON_222                      = 222,
+  ICON_223                      = 223,
+  ICON_224                      = 224,
+  ICON_225                      = 225,
+  ICON_226                      = 226,
+  ICON_227                      = 227,
+  ICON_228                      = 228,
+  ICON_229                      = 229,
+  ICON_230                      = 230,
+  ICON_231                      = 231,
+  ICON_232                      = 232,
+  ICON_233                      = 233,
+  ICON_234                      = 234,
+  ICON_235                      = 235,
+  ICON_236                      = 236,
+  ICON_237                      = 237,
+  ICON_238                      = 238,
+  ICON_239                      = 239,
+  ICON_240                      = 240,
+  ICON_241                      = 241,
+  ICON_242                      = 242,
+  ICON_243                      = 243,
+  ICON_244                      = 244,
+  ICON_245                      = 245,
+  ICON_246                      = 246,
+  ICON_247                      = 247,
+  ICON_248                      = 248,
+  ICON_249                      = 249,
+  ICON_250                      = 250,
+  ICON_251                      = 251,
+  ICON_252                      = 252,
+  ICON_253                      = 253,
+  ICON_254                      = 254,
+  ICON_255                      = 255,
+}
+--------------------------------------------------------------------------------------------------------------------------
+-- GUI Control property style color element
+global rlgui.propertyElement: type <cimport'GuiPropertyElement', cinclude'<raygui.h>',nodecl,using> = @enum(cint) {
+  BORDER = 0, 
+  BASE, 
+  TEXT, 
+  OTHER 
+}
+--------------------------------------------------------------------------------------------------------------------------

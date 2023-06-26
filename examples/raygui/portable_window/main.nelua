@@ -1,0 +1,67 @@
+require "raylib"
+require "raygui"
+
+-- Initialization
+---------------------------------------------------------------------------------------
+local SCREEN_WIDTH <const> = 800
+local SCREEN_HEIGHT <const> = 600
+
+rl.setConfigFlags(rl.configFlags.WINDOW_UNDECORATED)
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raygui.nelua - portable window")
+
+-- General variables
+local mousePosition = rl.vector2{ x = 0, y = 0 }
+local windowPosition = rl.vector2{ x = 500, y = 200 }
+local panOffset = mousePosition
+local dragWindow: boolean = false
+
+rl.setWindowPosition(windowPosition.x, windowPosition.y)
+
+local exitWindowPress: int32
+
+rl.setTargetFPS(60)
+--------------------------------------------------------------------------------------
+
+-- Main game loop
+while not rlgui.intToBool(exitWindowPress) and not rl.windowShouldClose() do
+    -- Update
+    ----------------------------------------------------------------------------------
+    mousePosition = rl.getMousePosition()
+
+    if rl.isMouseButtonPressed(rl.mouseButton.LEFT_BUTTON) and not dragWindow then
+        if rl.checkCollisionPointRec(mousePosition, rl.rectangle{ x = 0, y = 0, width = SCREEN_WIDTH, height = 20 }) then
+            dragWindow = true
+            panOffset = mousePosition
+        end
+    end
+
+    if dragWindow then
+        windowPosition.x = windowPosition.x + (mousePosition.x - panOffset.x)
+        windowPosition.y = windowPosition.y + (mousePosition.y - panOffset.y)
+
+        rl.setWindowPosition(math.floor(windowPosition.x), math.floor(windowPosition.y))
+
+        if rl.isMouseButtonReleased(rl.mouseButton.LEFT_BUTTON) then
+            dragWindow = false
+        end
+    end
+    ----------------------------------------------------------------------------------
+
+    -- Draw
+    ----------------------------------------------------------------------------------
+    rl.beginDrawing()
+
+    rl.clearBackground(rl.RAYWHITE)
+
+    exitWindowPress = rlgui.windowBox({ x = 0, y = 0, width = SCREEN_WIDTH, height = SCREEN_HEIGHT }, "#198# PORTABLE WINDOW")
+
+    rl.drawText(string.format("Mouse Position: [ %.0f, %.0f ]", mousePosition.x, mousePosition.y), 10, 40, 10, rl.DARKGRAY)
+
+    rl.endDrawing()
+    ----------------------------------------------------------------------------------
+end
+
+-- De-Initialization
+--------------------------------------------------------------------------------------
+rl.closeWindow() -- Close window and OpenGL context
+--------------------------------------------------------------------------------------

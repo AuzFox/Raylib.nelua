@@ -764,6 +764,7 @@ function rl.maximizeWindow(): void <cimport'MaximizeWindow', cinclude'<raylib.h>
 function rl.minimizeWindow(): void <cimport'MinimizeWindow', cinclude'<raylib.h>', nodecl> end -- Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
 function rl.restoreWindow(): void <cimport'RestoreWindow', cinclude'<raylib.h>', nodecl> end -- Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
 function rl.setWindowIcon(image: rl.image): void <cimport'SetWindowIcon', cinclude'<raylib.h>', nodecl> end -- Set icon for window (only PLATFORM_DESKTOP)
+function rl.setWindowIcons(image: *rl.image, count: cint): void <cimport'SetWindowIcons', cinclude'<raylib.h>', nodecl> end -- Set icon for window (only PLATFORM_DESKTOP)
 function rl.setWindowTitle(title: cstring): void <cimport'SetWindowTitle', cinclude'<raylib.h>', nodecl> end -- Set title for window (only PLATFORM_DESKTOP)
 function rl.setWindowPosition(x: cint, y: cint): void <cimport'SetWindowPosition', cinclude'<raylib.h>', nodecl> end -- Set window position on screen (only PLATFORM_DESKTOP)
 function rl.setWindowMonitor(monitor: cint): void <cimport'SetWindowMonitor', cinclude'<raylib.h>', nodecl> end -- Set monitor for the current window (fullscreen mode)
