@@ -743,7 +743,7 @@ global rl.loadFileDataCallback: type <cimport'LoadFileDataCallback', cinclude'<r
 global rl.saveFileDataCallback: type <cimport'SaveFileDataCallback', cinclude'<raylib.h>',nodecl> = @function(cstring, pointer, cuint): boolean
 global rl.loadFileTextCallback: type <cimport'LoadFileTextCallback', cinclude'<raylib.h>',nodecl> = @function(cstring): cstring
 global rl.saveFileTextCallback: type <cimport'SaveFileTextCallback', cinclude'<raylib.h>',nodecl> = @function(cstring, cstring): boolean
-
+global rl.audioCallback: type <cimport'AudioCallback', cinclude'<raylib.h>',nodecl> = @function(pointer, cuint): void
 
 -- Window-related functions
 function rl.initWindow(width: cint, height: cint, title: cstring): void <cimport'InitWindow', cinclude'<raylib.h>', nodecl> end -- Initialize window and OpenGL context
@@ -1386,6 +1386,7 @@ function rl.loadAudioStream(sampleRate: cuint, sampleSize: cuint, channels: cuin
 function rl.unloadAudioStream(stream: rl.audioStream): void <cimport'UnloadAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.updateAudioStream(stream: rl.audioStream, data: pointer, samplesCount: cint): void <cimport'UpdateAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.isAudioStreamProcessed(stream: rl.audioStream): boolean <cimport'IsAudioStreamProcessed', cinclude'<raylib.h>',nodecl> end
+function rl.isAudioStreamReady(stream: rl.audioStream): boolean <cimport'IsAudioStreamReady', cinclude'<raylib.h>',nodecl> end
 function rl.playAudioStream(stream: rl.audioStream): void <cimport'PlayAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.pauseAudioStream(stream: rl.audioStream): void <cimport'PauseAudioStream', cinclude'<raylib.h>',nodecl> end
 function rl.resumeAudioStream(stream: rl.audioStream): void <cimport'ResumeAudioStream', cinclude'<raylib.h>',nodecl> end
@@ -1395,6 +1396,11 @@ function rl.setAudioStreamVolume(stream: rl.audioStream, volume: float32): void 
 function rl.setAudioStreamPitch(stream: rl.audioStream, pitch: float32): void <cimport'SetAudioStreamPitch', cinclude'<raylib.h>',nodecl> end
 function rl.setAudioStreamPan(stream: rl.audioStream, pan: float32): void <cimport'SetAudioStreamPan', cinclude'<raylib.h>',nodecl> end
 function rl.setAudioStreamBufferSizeDefault(size: cint): void <cimport'SetAudioStreamBufferSizeDefault', cinclude'<raylib.h>',nodecl> end
+function rl.setAudioStreamCallback(stream: rl.audioStream, callback: rl.audioCallback): void <cimport'SetAudioStreamCallback', cinclude'<raylib.h>',nodecl> end
+function rl.attachAudioStreamProcessor(stream: rl.audioStream, processor: rl.audioCallback): void <cimport'AttachAudioStreamProcessor', cinclude'<raylib.h>',nodecl> end
+function rl.detachAudioStreamProcessor(stream: rl.audioStream, processor: rl.audioCallback): void <cimport'DetachAudioStreamProcessor', cinclude'<raylib.h>',nodecl> end
+function rl.attachAudioMixedProcessor(processor: rl.audioCallback): void <cimport'AttachAudioMixedProcessor', cinclude'<raylib.h>',nodecl> end
+function rl.detachAudioMixedProcessor(processor: rl.audioCallback): void <cimport'DetachAudioMixedProcessor', cinclude'<raylib.h>',nodecl> end
 
 -- Optional closures
 function rl.drawing(block: function()) <inline>
@@ -1889,9 +1895,7 @@ function rl.vector3.__lt(v1: rl.vector3, v2: rl.vector3): boolean <inline>
     return (v1.x < v2.x) and (v1.y < v2.y) and (v1.z < v2.z)
 end
 
-function rl.vector3.__le(v1: rl.vector3, v2: rl.vector3): boolean <inline>
-    return (v1.x <= v2.x) and (v1.y <= v2.y) and (v1.z <= v2.z)
-end
+function rl.vector3.__len(v: rl.vector3): float32 <cimport'Vector3Length', nodecl> end
 
 function rl.vector3.__idiv(v1: rl.vector3, v2: rl.vector3): rl.vector3 <inline>
     return (@rl.vector3){v1.x // v2.x, v1.y // v2.y, v1.z // v2.z}
@@ -2281,6 +2285,9 @@ function rl.matrix.perspective(fovy: number, aspect: number, near: number, far: 
 function rl.matrix.ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): rl.matrix <cimport'MatrixOrtho', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.lookAt(eye: rl.vector3, target: rl.vector3, up: rl.vector3): rl.matrix <cimport'MatrixLookAt', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.toFloatV(mat: rl.matrix): rl.matrix <cimport'MatrixToFloatV', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.__add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', nodecl> end
+function rl.matrix.__sub(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', nodecl> end
+function rl.matrix.__mul(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', nodecl> end
 
 -- ----------------------------------------------------------------------------------
 -- Module Functions Definition - Quaternion math
@@ -2308,3 +2315,5 @@ function rl.quaternion.fromEuler(pitch: float32, yaw: float32, roll: float32): r
 function rl.quaternion.toEuler(q: rl.quaternion): rl.vector3 <cimport'QuaternionToEuler', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.transform(q: rl.quaternion, mat: rl.matrix): rl.quaternion <cimport'QuaternionTransform', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.equals(p: rl.quaternion, q: rl.quaternion): boolean <cimport'QuaternionEquals', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.__len(q: rl.quaternion): float32 <cimport'QuaternionLength', nodecl> end
+function rl.quaternion.__mul(q1: rl.quaternion, q2: rl.quaternion): rl.quaternion <cimport'QuaternionMultiply', nodecl> end

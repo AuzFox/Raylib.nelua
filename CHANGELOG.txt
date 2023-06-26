@@ -1,5 +1,14 @@
 26/06/2023:
 - Add raygui binding
+- Add missing rl.audioCallback
+- Add missing rl.isAudioStreamReady
+- Add missing rl.setAudioStreamCallback
+- Add missing rl.attachAudioStreamProcessor
+- Add missing rl.detachAudioStreamProcessor
+- Add missing rl.attachAudioMixedProcessor
+- Add missing rl.detachAudioMixedProcessor
+- Add Matrix math metamethods
+- Add Quaternion math metamethods
 
 24/06/2023:
 - RLGL: Change rlgl.renderBatch properties vertexBuffer and draws to unbound array
