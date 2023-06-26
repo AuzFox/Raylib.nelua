@@ -1,6 +1,5 @@
 require "raylib"
 require "raygui"
-require "rlgl"
 
 -- Initialization
 --------------------------------------------------------------------------------------

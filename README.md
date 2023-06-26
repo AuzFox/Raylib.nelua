@@ -392,7 +392,6 @@ rl.closeWindow() -- Close window and OpenGL context
 ```lua
 require "raylib"
 require "raygui"
-require "rlgl"
 
 -- Initialization
 --------------------------------------------------------------------------------------
