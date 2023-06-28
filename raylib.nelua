@@ -1895,7 +1895,9 @@ function rl.vector3.__lt(v1: rl.vector3, v2: rl.vector3): boolean <inline>
     return (v1.x < v2.x) and (v1.y < v2.y) and (v1.z < v2.z)
 end
 
-function rl.vector3.__len(v: rl.vector3): float32 <cimport'Vector3Length', nodecl> end
+function rl.vector3.__le(v1: rl.vector3, v2: rl.vector3): boolean <inline>
+    return (v1.x <= v2.x) and (v1.y <= v2.y) and (v1.z <= v2.z)
+end
 
 function rl.vector3.__idiv(v1: rl.vector3, v2: rl.vector3): rl.vector3 <inline>
     return (@rl.vector3){v1.x // v2.x, v1.y // v2.y, v1.z // v2.z}
