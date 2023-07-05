@@ -2187,7 +2187,7 @@ function rl.vector3.unproject(source: rl.vector3, projection: rl.matrix, view: r
     return result
 end
 
-function rl.vector3:toFloatV() <inline>
+function rl.vector3:toFloatV(): rl.float3 <inline>
     local buffer: rl.float3 = {}
 
     buffer.v[0] = self.x
@@ -2286,7 +2286,7 @@ function rl.matrix.frustum(left: number, right: number, bottom: number, top: num
 function rl.matrix.perspective(fovy: number, aspect: number, near: number, far: number): rl.matrix <cimport'MatrixPerspective', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): rl.matrix <cimport'MatrixOrtho', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.lookAt(eye: rl.vector3, target: rl.vector3, up: rl.vector3): rl.matrix <cimport'MatrixLookAt', cinclude'<raymath.h>',nodecl> end
-function rl.matrix.toFloatV(mat: rl.matrix): rl.matrix <cimport'MatrixToFloatV', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.toFloatV(mat: rl.matrix): rl.float16 <cimport'MatrixToFloatV', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.__add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', nodecl> end
 function rl.matrix.__sub(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', nodecl> end
 function rl.matrix.__mul(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', nodecl> end
