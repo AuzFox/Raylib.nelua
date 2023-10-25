@@ -1,8 +1,8 @@
 require 'raylib'
 
 ##[[ 
-  cinclude "raygui.h" 
-  linklib "raygui"
+  cdefine 'RAYGUI_IMPLEMENTATION'
+  cinclude "raygui.h"
 ]]
 
 -- Constants
@@ -12,7 +12,7 @@ global rlgui = @record{}
 global rlgui.VERSION_MAJOR <const> = 4
 global rlgui.VERSION_MINOR <const> = 0
 global rlgui.VERSION_PATCH <const> = 0
-global rlgui.VERSION <const> = "4.0-dev"
+global rlgui.VERSION <const> = "4.0"
 
 global rlgui.SCROLLBAR_LEFT_SIDE = 0
 global rlgui.SCROLLBAR_RIGHT_SIDE = 0
