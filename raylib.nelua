@@ -1409,14 +1409,14 @@ function rl.drawing(block: function()) <inline>
     rl.endDrawing()
 end
 
-function rl.mode2D(block: function()) <inline>
-    rl.beginMode2D()
+function rl.mode2D(camera: rl.camera2D, block: function()) <inline>
+    rl.beginMode2D(camera)
     block()
     rl.endMode2D()
 end
 
-function rl.mode3D(block: function()) <inline>
-    rl.beginMode3D()
+function rl.mode3D(camera: rl.camera3D ,block: function()) <inline>
+    rl.beginMode3D(camera)
     block()
     rl.endMode3D()
 end

@@ -20,7 +20,6 @@ camera.projection = rl.cameraProjection.PERSPECTIVE -- Camera projection type
 
 local cubePosition = rl.vector3{ 0, 0, 0 }
 
-
 rl.disableCursor() -- Limit cursor to relative movement inside the window
 
 rl.setTargetFPS(60)
@@ -34,7 +33,6 @@ while not rl.windowShouldClose() do        -- Detect window close button or ESC 
   rl.updateCamera(&camera, rl.cameraMode.FREE)
   
   if rl.isKeyDown(rl.keyboardKey.Z) then camera.target = rl.vector3{ 0, 0, 0 } end
-
 
   -- Draw
   ----------------------------------------------------------------------------------
