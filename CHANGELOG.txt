@@ -1,3 +1,11 @@
+18/11/2023:
+- Update raylib.nelua and rlgl.nelua to version 5.0
+- Rework rl.vector2 and rl.vector3 math functions for better API consistency
+  - Now functions are declared as static functions on the type and return a new result vector
+  - As an example:
+    - rl.vector2:normalize() is now rl.vector2.normalize(v: rl.vector2): rl.vector2
+  - metamethods (such as rl.vector2:__add()) have been kept for ease of use
+
 26/06/2023:
 - Add raygui binding
 - Add missing rl.audioCallback
@@ -27,7 +35,6 @@
 
 
 22/06/2023:
-
 - Update Raylib.nelua to version 4.5
 - Include extra optional rcamera.nelua submodule with additional camera functionalities
 - Add optional closures: rl.drawing(), rl.mode2D(), rl.mode3D(), rl.textureMode(), rl.shaderMode(), rl.blendingMode(), rl.scissorMode(), rl.vrMode()

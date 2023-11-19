@@ -255,6 +255,7 @@ function rlgl.disableShader(): void <cimport'rlDisableShader', cinclude'<rlgl.h>
 function rlgl.enableFramebuffer(id: cuint): void <cimport'rlEnableFramebuffer', cinclude'<rlgl.h>',nodecl> end
 function rlgl.disableFramebuffer(): void <cimport'rlDisableFramebuffer', cinclude'<rlgl.h>',nodecl> end
 function rlgl.activeDrawBuffers(count: cint): void <cimport'rlActiveDrawBuffers', cinclude'<rlgl.h>',nodecl> end
+function rlgl.blitFramebuffer(srcX: cint, srcY: cint, srcWidth: cint, srcHeight: cint, dstX: cint, dstY: cint, dstWidth: cint, dstHeight: cint, bufferMask: cint): void <cimport'rlBlitFramebuffer', cinclude'<rlgl.h>',nodecl> end
 
 --------------------------------------------------------------------------------------------------------------------------
 
@@ -272,6 +273,7 @@ function rlgl.enableScissorTest(): void <cimport'rlEnableScissorTest', cinclude'
 function rlgl.disableScissorTest(): void <cimport'rlDisableScissorTest', cinclude'<rlgl.h>',nodecl> end
 function rlgl.scissor(x: cint, y: cint, width: cint, height: cint): void <cimport'rlScissor', cinclude'<rlgl.h>',nodecl> end
 function rlgl.enableWireMode(): void <cimport'rlEnableWireMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.enablePointMode(): void <cimport'rlEnablePointMode', cinclude'<rlgl.h>',nodecl> end
 function rlgl.disableWireMode(): void <cimport'rlDisableWireMode', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setLineWidth(width: float32): void <cimport'rlSetLineWidth', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getLineWidth(): float32 <cimport'rlGetLineWidth', cinclude'<rlgl.h>',nodecl> end

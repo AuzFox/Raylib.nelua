@@ -27,7 +27,8 @@ Contributions to **Raylib.nelua** are more than welcome! I would highly suggest 
 
 ## Contributors
 
-- [Kenta](https://github.com/Its-Kenta) - Creator and maintainer
+- [Kenta](https://github.com/Its-Kenta) - Creator
+- [Auz](https://github.com/AuzFox) - Maintainer
 
 ## Credits
 

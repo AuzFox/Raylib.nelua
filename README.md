@@ -11,7 +11,7 @@
 
 </div>
 
-**Raylib.nelua** is a [Raylib](https://www.raylib.com/) binding for latest Raylib 4.5 version. A simple and easy-to-use library to learn videogames programming.
+**Raylib.nelua** is a [Raylib](https://www.raylib.com/) binding for latest Raylib 5.0 version. A simple and easy-to-use library to learn videogames programming.
 
 Raylib.nelua. It's like Raylib on steroids, except without the harmful side effects. This delightful little binding brings the power and simplicity of Nelua to the world of Raylib game development.
 
