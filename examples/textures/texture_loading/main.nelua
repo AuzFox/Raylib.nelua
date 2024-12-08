@@ -13,7 +13,7 @@ rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "Raylib.nelua [textures] example - tex
 rl.setTargetFPS(60)
 
 -- NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
-local texture = rl.loadTexture("./resources/logo.png") -- Texture loading
+local texture = rl.loadTexture("examples/textures/texture_loading/resources/logo.png") -- Texture loading
 
 -- Main game loop
 
