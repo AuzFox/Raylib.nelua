@@ -7,6 +7,12 @@ cinclude "rcamera.h"
 -- Raylib camera
 global rlc = @record{}
 
+global rlc.CAMERA_MOVE_SPEED <const> = 5.4
+global rlc.CAMERA_ROTATION_SPEED <const> = 0.03
+global rlc.CAMERA_PAN_SPEED <const> = 0.2
+global rlc.CAMERA_MOUSE_MOVE_SENSITIVITY <const> = 0.003
+global rlc.CAMERA_ORBITAL_SPEED <const> = 0.5
+
 --------------------------------------------------------------------------------------
 -- Extra camera System Functions (Module: rcamera)
 --------------------------------------------------------------------------------------
