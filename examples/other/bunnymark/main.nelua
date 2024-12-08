@@ -36,7 +36,7 @@ end
 rl.initWindow(SCREEN_WIDTH,SCREEN_HEIGHT, "Raylib.nelua [textures] example - bunnymark")
 rl.setTargetFPS(60)
 
-local texBunny = rl.loadTexture("./resources/wabbit_alpha.png") -- Loading bunny texture
+local texBunny = rl.loadTexture("examples/other/bunnymark/resources/wabbit_alpha.png") -- Loading bunny texture
 local bunnies: vector(Bunny) = {} -- Initialising a vector of type Bunny
 --------------------------------------------------------------------------------------
 
