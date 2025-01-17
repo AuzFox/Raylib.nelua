@@ -1041,6 +1041,8 @@ function rl.updateCameraPro(camera: *rl.camera, movement: rl.vector3, rotation: 
 -- NOTE: It can be useful when using basic shapes and one single font,
 -- defining a font char white rectangle would allow drawing everything in a single draw call
 function rl.setShapesTexture(texture: rl.texture2D, source: rl.rectangle): void <cimport'SetShapesTexture', cinclude'<raylib.h>',nodecl> end
+function rl.getShapesTexture(): rl.texture2D <cimport'GetShapesTexture', cinclude'<raylib.h>',nodecl> end -- Get texture that is used for shapes drawing
+function rl.getShapesTextureRectangle(): rl.rectangle <cimport'GetShapesTextureRectangle', cinclude'<raylib.h>',nodecl> end -- Get texture source rectangle that is used for shapes drawing
 
 -- Basic Shapes drawing functions
 function rl.drawPixel(posX: cint, posY: cint, color: rl.color): void <cimport'DrawPixel', cinclude'<raylib.h>',nodecl> end
