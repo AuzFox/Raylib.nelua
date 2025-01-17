@@ -1191,7 +1191,7 @@ function rl.imageDrawPixel(dst: *rl.image, posX: cint, posY: cint, color: rl.col
 function rl.imageDrawPixelV(dst: *rl.image, position: rl.vector2, color: rl.color): void <cimport'ImageDrawPixelV', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawLine(dst: *rl.image, startPosX: cint, startPosY: cint, endPosX: cint, endPosY: cint, color: rl.color): void <cimport'ImageDrawLine', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawLineV(dst: *rl.image, start: rl.vector2, End: rl.vector2, color: rl.color): void <cimport'ImageDrawLineV', cinclude'<raylib.h>',nodecl> end
-function rl.imageDrawLineEx(dst: *rl.image, start: rl.vector2, End: rl.vector2, color: rl.color, thick: cint, color: rl.color): void <cimport'ImageDrawLineV', cinclude'<raylib.h>',nodecl> end
+function rl.imageDrawLineEx(dst: *rl.image, start: rl.vector2, End: rl.vector2, thick: cint, color: rl.color): void <cimport'ImageDrawLineEx', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawCircle(dst: *rl.image, centerX: cint, centerY: cint, radius: cint, color: rl.color): void <cimport'ImageDrawCircle', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawCircleV(dst: *rl.image, center: rl.vector2, radius: cint, color: rl.color): void <cimport'ImageDrawCircleV', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawCircleLines(dst: *rl.image, centerX: cint, centerY: cint, radius: cint, color: rl.color): void <cimport'ImageDrawCircleLines', cinclude'<raylib.h>',nodecl> end
