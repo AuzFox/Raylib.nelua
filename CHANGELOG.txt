@@ -1,3 +1,6 @@
+17/1/2025:
+- Update raylib.nelua and rlgl.nelua to version 5.5 (Thank you, james2doyle!)
+
 18/11/2023:
 - Update raylib.nelua and rlgl.nelua to version 5.0
 - Rework rl.vector2 and rl.vector3 math functions for better API consistency
