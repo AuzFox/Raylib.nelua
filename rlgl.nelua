@@ -346,9 +346,9 @@ function rlgl.multMatrixf(matf: *float32): void <cimport'rlMultMatrixf', cinclud
 function rlgl.frustum(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): void <cimport'rlFrustum', cinclude'<rlgl.h>',nodecl> end
 function rlgl.ortho(left: number, right: number, bottom: number, top: number, znear: number, zfar: number): void <cimport'rlOrtho', cinclude'<rlgl.h>',nodecl> end
 function rlgl.viewport(x: cint, y: cint, width: cint, height: cint): void <cimport'rlViewport', cinclude'<rlgl.h>',nodecl> end
-function rlgl.setClipPlanes(nearPlane: float32, farPlane: float32): void <cimport'rlSetClipPlanes', cinclude'<rlgl.h>',nodecl> end
-function rlgl.getCullDistanceNear(): float32 <cimport'rlGetCullDistanceNear', cinclude'<rlgl.h>',nodecl> end
-function rlgl.getCullDistanceFar(): float32 <cimport'rlGetCullDistanceFar', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setClipPlanes(nearPlane: float64, farPlane: float64): void <cimport'rlSetClipPlanes', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getCullDistanceNear(): float64 <cimport'rlGetCullDistanceNear', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getCullDistanceFar(): float64 <cimport'rlGetCullDistanceFar', cinclude'<rlgl.h>',nodecl> end
 
 --------------------------------------------------------------------------------------------------------------------------
 
@@ -404,7 +404,7 @@ function rlgl.disableShader(): void <cimport'rlDisableShader', cinclude'<rlgl.h>
 -- Framebuffer state
 function rlgl.enableFramebuffer(id: cuint): void <cimport'rlEnableFramebuffer', cinclude'<rlgl.h>',nodecl> end
 function rlgl.disableFramebuffer(): void <cimport'rlDisableFramebuffer', cinclude'<rlgl.h>',nodecl> end
-function rlgl.getActiveFramebuffer(): uint <cimport'rlGetActiveFramebuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getActiveFramebuffer(): cuint <cimport'rlGetActiveFramebuffer', cinclude'<rlgl.h>',nodecl> end
 function rlgl.activeDrawBuffers(count: cint): void <cimport'rlActiveDrawBuffers', cinclude'<rlgl.h>',nodecl> end
 function rlgl.blitFramebuffer(srcX: cint, srcY: cint, srcWidth: cint, srcHeight: cint, dstX: cint, dstY: cint, dstWidth: cint, dstHeight: cint, bufferMask: cint): void <cimport'rlBlitFramebuffer', cinclude'<rlgl.h>',nodecl> end
 function rlgl.bindFramebuffer(target: uint, framebuffer: uint): void <cimport'rlBindFramebuffer', cinclude'<rlgl.h>',nodecl> end
