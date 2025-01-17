@@ -775,7 +775,7 @@ global rl.audioCallback: type <cimport'AudioCallback', cinclude'<raylib.h>',node
 function rl.initWindow(width: cint, height: cint, title: cstring): void <cimport'InitWindow', cinclude'<raylib.h>', nodecl> end -- Initialize window and OpenGL context
 function rl.closeWindow(): void <cimport'CloseWindow', cinclude'<raylib.h>', nodecl> end -- Close window and unload OpenGL context
 function rl.windowShouldClose(): boolean <cimport'WindowShouldClose', cinclude'<raylib.h>', nodecl> end -- Check if KEY_ESCAPE pressed or Close icon pressed
-function rl.isWindowValid(): boolean <cimport'IsWindowValid', cinclude'<raylib.h>', nodecl> end -- Check if window has been initialized successfully
+function rl.isWindowReady(): boolean <cimport'IsWindowReady', cinclude'<raylib.h>', nodecl> end -- Check if window has been initialized successfully
 function rl.isWindowMinimized(): boolean <cimport'IsWindowMinimized', cinclude'<raylib.h>', nodecl> end -- Check if window is currently minimized (only PLATFORM_DESKTOP)
 function rl.isWindowMaximized(): boolean <cimport'IsWindowMaximized', cinclude'<raylib.h>', nodecl> end -- Check if window is currently maximized (only PLATFORM_DESKTOP)
 function rl.isWindowFocused(): boolean <cimport'IsWindowFocused', cinclude'<raylib.h>', nodecl> end -- Check if window is currently focused (only PLATFORM_DESKTOP)
@@ -1424,7 +1424,7 @@ function rl.getRayCollisionQuad(ray: rl.ray, p1: rl.vector3, p2: rl.vector3, p3:
 -- Audio device management functions
 function rl.initAudioDevice(): void <cimport'InitAudioDevice', cinclude'<raylib.h>',nodecl> end
 function rl.closeAudioDevice(): void <cimport'CloseAudioDevice', cinclude'<raylib.h>',nodecl> end
-function rl.isAudioDeviceValid(): boolean <cimport'IsAudioDeviceValid', cinclude'<raylib.h>',nodecl> end
+function rl.isAudioDeviceReady(): boolean <cimport'IsAudioDeviceReady', cinclude'<raylib.h>',nodecl> end
 function rl.setMasterVolume(volume: float32): void <cimport'SetMasterVolume', cinclude'<raylib.h>',nodecl> end
 function rl.getMasterVolume(): float32 <cimport'GetMasterVolume', cinclude'<raylib.h>',nodecl> end
 
