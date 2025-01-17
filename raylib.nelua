@@ -217,7 +217,7 @@ global rl.mesh: type <cimport'Mesh', cinclude'<raylib.h>',nodecl> = @record{
     animNormals: *float32,
     boneIds: *cint,
     boneWeights: *float32,
-    boneMatrices: rl.matrix,
+    boneMatrices: *rl.matrix,
     boneCount: cint,
 
     vaoId: cuint,
@@ -817,7 +817,7 @@ function rl.getWindowPosition(): rl.vector2 <cimport'GetWindowPosition', cinclud
 function rl.getWindowScaleDPI(): rl.vector2 <cimport'GetWindowScaleDPI', cinclude'<raylib.h>', nodecl> end -- Get window scale DPI factor
 function rl.getMonitorName(monitor: cint): cstring <cimport'GetMonitorName', cinclude'<raylib.h>', nodecl> end -- Get the human-readable, UTF-8 encoded name of the specified monitor
 function rl.getClipboardText(): cstring <cimport'GetClipboardText', cinclude'<raylib.h>', nodecl> end -- Get clipboard text content
-function rl.getClipboardImage(): cstring <cimport'GetClipboardImage', cinclude'<raylib.h>', nodecl> end -- Get clipboard image content
+function rl.getClipboardImage(): rl.image <cimport'GetClipboardImage', cinclude'<raylib.h>', nodecl> end -- Get clipboard image content
 function rl.setClipboardText(text: cstring): void <cimport'SetClipboardText', cinclude'<raylib.h>', nodecl> end -- Set clipboard text content
 function rl.enableEventWaiting(): void <cimport'EnableEventWaiting', cinclude'<raylib.h>', nodecl> end -- Enable waiting for events on EndDrawing(), no automatic event polling
 function rl.disableEventWaiting(): void <cimport'DisableEventWaiting', cinclude'<raylib.h>', nodecl> end -- Disable waiting for events on EndDrawing(), automatic events polling
@@ -934,7 +934,7 @@ function rl.getDirectoryPath(filePath: cstring): cstring <cimport'GetDirectoryPa
 function rl.getPrevDirectoryPath(dirPath: cstring): cstring <cimport'GetPrevDirectoryPath', cinclude'<raylib.h>',nodecl> end
 function rl.getWorkingDirectory(): cstring <cimport'GetWorkingDirectory', cinclude'<raylib.h>',nodecl> end
 function rl.getApplicationDirectory(): cstring <cimport'GetApplicationDirectory', cinclude'<raylib.h>',nodecl> end
-function rl.makeDirectory(dirPath: string): cint <cimport'MakeDirectory', cinclude'<raylib.h>',nodecl> end
+function rl.makeDirectory(dirPath: cstring): cint <cimport'MakeDirectory', cinclude'<raylib.h>',nodecl> end
 function rl.loadDirectoryFiles(dir: cstring): rl.filePathList <cimport'LoadDirectoryFiles', cinclude'<raylib.h>',nodecl> end
 function rl.loadDirectoryFilesEx(basePath: cstring, filter: cstring, scanSubDirs: boolean): rl.filePathList <cimport'LoadDirectoryFilesEx', cinclude'<raylib.h>',nodecl> end
 function rl.unloadDirectoryFiles(files: rl.filePathList): void <cimport'UnloadDirectoryFiles', cinclude'<raylib.h>',nodecl> end
@@ -1246,7 +1246,7 @@ function rl.colorBrightness(color: rl.color, factor: float32): rl.color <cimport
 function rl.colorContrast(color: rl.color, contrast: float32): rl.color <cimport'ColorContrast', cinclude'<raylib.h>',nodecl> end
 function rl.colorAlpha(color: rl.color, alpha: float32): rl.color <cimport'ColorAlpha', cinclude'<raylib.h>',nodecl> end
 function rl.colorAlphaBlend(dst: rl.color, src: rl.color, tint: rl.color): rl.color <cimport'ColorAlphaBlend', cinclude'<raylib.h>',nodecl> end
-function rl.colorLerp(color1: rl.color, color2: rl.color, factor: float32): boolean <cimport'ColorLerp', cinclude'<raylib.h>',nodecl> end
+function rl.colorLerp(color1: rl.color, color2: rl.color, factor: float32): rl.color <cimport'ColorLerp', cinclude'<raylib.h>',nodecl> end
 function rl.getColor(hexValue: cint): rl.color <cimport'GetColor', cinclude'<raylib.h>',nodecl> end
 function rl.getPixelColor(srcPtr: pointer, format: cint): rl.color <cimport'GetPixelColor', cinclude'<raylib.h>',nodecl> end
 function rl.setPixelColor(dstPtr: pointer, color: rl.color, format: cint): void <cimport'SetPixelColor', cinclude'<raylib.h>',nodecl> end
@@ -1313,8 +1313,8 @@ function rl.textFindIndex(text: cstring, find: cstring): cint <cimport'TextFindI
 function rl.textToUpper(text: cstring): cstring <cimport'TextToUpper', cinclude'<raylib.h>',nodecl> end
 function rl.textToLower(text: cstring): cstring <cimport'TextToLower', cinclude'<raylib.h>',nodecl> end
 function rl.textToPascal(text: cstring): cstring <cimport'TextToPascal', cinclude'<raylib.h>',nodecl> end
-function rl.textToSnake(text: cstring): cint <cimport'TextToSnake', cinclude'<raylib.h>',nodecl> end
-function rl.textToCamel(text: cstring): cint <cimport'TextToCamel', cinclude'<raylib.h>',nodecl> end
+function rl.textToSnake(text: cstring): cstring <cimport'TextToSnake', cinclude'<raylib.h>',nodecl> end
+function rl.textToCamel(text: cstring): cstring <cimport'TextToCamel', cinclude'<raylib.h>',nodecl> end
 function rl.textToInteger(text: cstring): cint <cimport'TextToInteger', cinclude'<raylib.h>',nodecl> end
 function rl.textToFloat(text: cstring): float32 <cimport'TextToFloat', cinclude'<raylib.h>',nodecl> end
 
