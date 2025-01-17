@@ -1361,7 +1361,7 @@ function rl.drawModel(model: rl.model, position: rl.vector3, scale: float32, tin
 function rl.drawModelEx(model: rl.model, position: rl.vector3, rotationAxis: rl.vector3, rotationAngle: float32, scale: rl.vector3, tint: rl.color): void <cimport'DrawModelEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawModelWires(model: rl.model, position: rl.vector3, scale: float32, tint: rl.color): void <cimport'DrawModelWires', cinclude'<raylib.h>',nodecl> end
 function rl.drawModelWiresEx(model: rl.model, position: rl.vector3, rotationAxis: rl.vector3, rotationAngle: float32, scale: rl.vector3, tint: rl.color): void <cimport'DrawModelWiresEx', cinclude'<raylib.h>',nodecl> end
-function rl.DrawModelPoints(model: rl.model, position: rl.vector3, scale: float32, tint: rl.color): void <cimport'DrawModelPoints', cinclude'<raylib.h>',nodecl> end
+function rl.drawModelPoints(model: rl.model, position: rl.vector3, scale: float32, tint: rl.color): void <cimport'DrawModelPoints', cinclude'<raylib.h>',nodecl> end
 function rl.drawModelPointsEx(model: rl.model, position: rl.vector3, rotationAxis: rl.vector3, rotationAngle: float32, scale: rl.vector3, tint: rl.color): void <cimport'DrawModelPointsEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawBoundingBox(box: rl.boundingBox, color: rl.color): void <cimport'DrawBoundingBox', cinclude'<raylib.h>',nodecl> end
 function rl.drawBillboard(camera: rl.camera, texture: rl.texture2D, center: rl.vector3, scale: float32, tint: rl.color): void <cimport'DrawBillboard', cinclude'<raylib.h>',nodecl> end
