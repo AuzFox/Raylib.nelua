@@ -1,3 +1,6 @@
+25/1/2025:
+- Fix some mistakes in raylib.nelua
+
 17/1/2025:
 - Update raylib.nelua and rlgl.nelua to version 5.5 (Thank you, james2doyle!)
 

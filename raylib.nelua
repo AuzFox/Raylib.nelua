@@ -323,7 +323,7 @@ global rl.audioStream: type <cimport'AudioStream', cinclude'<raylib.h>',nodecl> 
 -- Sound
 global rl.sound: type <cimport'Sound', cinclude'<raylib.h>',nodecl> = @record{
     stream: rl.audioStream,
-    ampleCount: cuint
+    sampleCount: cuint
 }
 
 -- Music, audio stream, anything longer than ~10 seconds should be streamed
@@ -607,7 +607,7 @@ global rl.shaderLocationIndex: type <cimport'ShaderLocationIndex', cinclude'<ray
     VERTEX_TEXCOORD02 = 2,
     VERTEX_NORMAL = 3,
     VERTEX_TANGENT = 4,
-    VERTEX_color = 5,
+    VERTEX_COLOR = 5,
     MATRIX_MVP = 6,
     MATRIX_VIEW = 7,
     MATRIX_PROJECTION = 8,
@@ -720,9 +720,11 @@ global rl.blendMode: type <cimport'BlendMode', cinclude'<raylib.h>',nodecl,using
     ALPHA = 0,
     ADDITIVE = 1,
     MULTIPLIED = 2,
-    ADD_colorS = 3,
-    SUBTRACT_colorS = 4,
-    CUSTOM = 5
+    ADD_COLORS = 3,
+    SUBTRACT_COLORS = 4,
+    ALPHA_PREMULTIPLY = 5,
+    CUSTOM = 6,
+    CUSTOM_SEPARATE = 7
 }
 
 -- Gesture
@@ -803,8 +805,8 @@ function rl.setWindowFocused(): void <cimport'SetWindowFocused', cinclude'raylib
 function rl.getWindowHandle(): pointer <cimport'GetWindowHandle', cinclude'<raylib.h>', nodecl> end -- Get native window handle
 function rl.getScreenWidth(): cint <cimport'GetScreenWidth', cinclude'<raylib.h>', nodecl> end -- Get current screen width
 function rl.getScreenHeight(): cint <cimport'GetScreenHeight', cinclude'<raylib.h>', nodecl> end -- Get current screen height
-function rl.getRenderWidth(): void <cimport'GetRenderWidth', cinclude'raylib.h', nodecl> end-- Get current render width (it considers HiDPI)
-function rl.getRenderHeight(): void <cimport'GetRenderHeight', cinclude'raylib.h', nodecl> end-- Get current render height (it considers HiDPI)
+function rl.getRenderWidth(): cint <cimport'GetRenderWidth', cinclude'raylib.h', nodecl> end-- Get current render width (it considers HiDPI)
+function rl.getRenderHeight(): cint <cimport'GetRenderHeight', cinclude'raylib.h', nodecl> end-- Get current render height (it considers HiDPI)
 function rl.getMonitorCount(): cint <cimport'GetMonitorCount', cinclude'<raylib.h>', nodecl> end -- Get number of connected monitors
 function rl.getCurrentMonitor(): cint <cimport'GetCurrentMonitor', cinclude'<raylib.h>', nodecl> end -- Get number of connected monitors
 function rl.getMonitorPosition(monitor: cint): rl.vector2 <cimport'GetMonitorPosition', cinclude'<raylib.h>', nodecl> end -- Get specified monitor position
@@ -1868,7 +1870,7 @@ function rl.matrix.identity(): rl.matrix <cimport'MatrixIdentity', cinclude'<ray
 function rl.matrix.add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.subtract(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.multiply(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', cinclude'<raymath.h>',nodecl> end
-function rl.matrix.translate(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixTranslate', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.translate(x: float32, y: float32, z: float32): rl.matrix <cimport'MatrixTranslate', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.rotate(axis: rl.vector3, angle: float32): rl.matrix <cimport'MatrixRotate', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.rotateX(angle: float32): rl.matrix <cimport'MatrixRotateX', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.rotateY(angle: float32): rl.matrix <cimport'MatrixRotateY', cinclude'<raymath.h>',nodecl> end
