@@ -118,12 +118,12 @@ global rlgl.DEFAULT_SHADER_ATTRIB_LOCATION_BONEWEIGHTS <const> = 8
 
 -- Dynamic vertex buffers (position + texcoords + colors + indices arrays)
 global rlgl.vertexBuffer: type <cimport'rlVertexBuffer', cinclude'<rlgl.h>',nodecl> = @record{
-  elementCount: float32,
+  elementCount: cint,
   vertices: *float32,
   texcoords: *float32,
   normals: *float32,
   colors: *cuchar,
-  indencies: *cuint,
+  indices: *cuint,
   vaoId: cuint,
   vboId: [5]cuint
 }
@@ -166,59 +166,6 @@ global rlgl.glVersion: type <cimport'rlGlVersion', cinclude'<rlgl.h>',nodecl,usi
 
 --------------------------------------------------------------------------------------------------------------------------
 
-global rlgl.framebufferAttachType: type <cimport'rlFramebufferAttachType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
-  COLOR_CHANNEL0 = 0,
-  COLOR_CHANNEL1,
-  COLOR_CHANNEL2,
-  COLOR_CHANNEL3,
-  COLOR_CHANNEL4,
-  COLOR_CHANNEL5,
-  COLOR_CHANNEL6,
-  COLOR_CHANNEL7,
-  DEPTH = 100,
-  STENCIL = 200,
-}
-
---------------------------------------------------------------------------------------------------------------------------
-
-global rlgl.framebufferAttachTextureType: type <cimport'rlFramebufferAttachTextureType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
-  CUBEMAP_POSITIVE_X = 0,
-  CUBEMAP_NEGATIVE_X,
-  CUBEMAP_POSITIVE_Y,
-  CUBEMAP_NEGATIVE_Y,
-  CUBEMAP_POSITIVE_Z,
-  CUBEMAP_NEGATIVE_Z,
-  TEXTURE2D = 100,
-  RENDERBUFFER = 200
-}
-
---------------------------------------------------------------------------------------------------------------------------
-
-global rlgl.cullMode: type <cimport'rlCullMode', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
-  FACE_FRONT = 0,
-  FACE_BACK
-}
-
---------------------------------------------------------------------------------------------------------------------------
-
-global rlgl.shaderUniformDataType: type <cimport'rlShaderUniformDataType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
-  FLOAT = 0,
-  VEC2 = 1,
-  VEC3 = 2,
-  VEC4 = 3,
-  INT = 4,
-  IVEC2 = 5,
-  IVEC3 = 6,
-  IVEC4 = 7,
-  UINT = 8,
-  UIVEC2 = 9,
-  UIVEC3 = 10,
-  UIVEC4 = 11,
-  SAMPLER2D = 12
-}
-
---------------------------------------------------------------------------------------------------------------------------
-
 global rlgl.traceLogLevel: type <cimport'rlTraceLogLevel', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
   ALL = 0,
   TRACE = 1,
@@ -232,7 +179,7 @@ global rlgl.traceLogLevel: type <cimport'rlTraceLogLevel', cinclude'<rlgl.h>',no
 
 --------------------------------------------------------------------------------------------------------------------------
 
-global rlgl.shaderUniformDataType: type <cimport'rlPixelFormat', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+global rlgl.pixelFormat: type <cimport'rlPixelFormat', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
   UNCOMPRESSED_GRAYSCALE = 1,
   UNCOMPRESSED_GRAY_ALPHA = 2,
   UNCOMPRESSED_R5G6B5 = 3,
@@ -261,7 +208,7 @@ global rlgl.shaderUniformDataType: type <cimport'rlPixelFormat', cinclude'<rlgl.
 
 --------------------------------------------------------------------------------------------------------------------------
 
-global rlgl.shaderUniformDataType: type <cimport'rlTextureFilter', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+global rlgl.textureFilter: type <cimport'rlTextureFilter', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
   POINT = 0,
   BILINEAR = 1,
   TRILINEAR = 2,
@@ -317,19 +264,63 @@ global rlgl.shaderLocationIndex: type <cimport'rlShaderLocationIndex', cinclude'
 --------------------------------------------------------------------------------------------------------------------------
 
 global rlgl.shaderUniformDataType: type <cimport'rlShaderUniformDataType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
-    FLOAT = 0,
-    VEC2 = 1,
-    VEC3 = 2,
-    VEC4 = 3,
-    INT = 4,
-    IVEC2 = 5,
-    IVEC3 = 6,
-    IVEC4 = 7,
-    UINT = 8,
-    UIVEC2 = 9,
-    UIVEC3 = 10,
-    UIVEC4 = 11,
-    SAMPLER2D = 12
+  FLOAT = 0,
+  VEC2 = 1,
+  VEC3 = 2,
+  VEC4 = 3,
+  INT = 4,
+  IVEC2 = 5,
+  IVEC3 = 6,
+  IVEC4 = 7,
+  UINT = 8,
+  UIVEC2 = 9,
+  UIVEC3 = 10,
+  UIVEC4 = 11,
+  SAMPLER2D = 12
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.shaderAttributeDataType: type <cimport'rlShaderAttributeDataType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  FLOAT = 0,
+  VEC2 = 1,
+  VEC3 = 2,
+  VEC4 = 3
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.framebufferAttachType: type <cimport'rlFramebufferAttachType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  COLOR_CHANNEL0 = 0,
+  COLOR_CHANNEL1,
+  COLOR_CHANNEL2,
+  COLOR_CHANNEL3,
+  COLOR_CHANNEL4,
+  COLOR_CHANNEL5,
+  COLOR_CHANNEL6,
+  COLOR_CHANNEL7,
+  DEPTH = 100,
+  STENCIL = 200,
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.framebufferAttachTextureType: type <cimport'rlFramebufferAttachTextureType', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  CUBEMAP_POSITIVE_X = 0,
+  CUBEMAP_NEGATIVE_X,
+  CUBEMAP_POSITIVE_Y,
+  CUBEMAP_NEGATIVE_Y,
+  CUBEMAP_POSITIVE_Z,
+  CUBEMAP_NEGATIVE_Z,
+  TEXTURE2D = 100,
+  RENDERBUFFER = 200
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+global rlgl.cullMode: type <cimport'rlCullMode', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  FACE_FRONT = 0,
+  FACE_BACK
 }
 
 --------------------------------------------------------------------------------------------------------------------------
@@ -407,7 +398,7 @@ function rlgl.disableFramebuffer(): void <cimport'rlDisableFramebuffer', cinclud
 function rlgl.getActiveFramebuffer(): cuint <cimport'rlGetActiveFramebuffer', cinclude'<rlgl.h>',nodecl> end
 function rlgl.activeDrawBuffers(count: cint): void <cimport'rlActiveDrawBuffers', cinclude'<rlgl.h>',nodecl> end
 function rlgl.blitFramebuffer(srcX: cint, srcY: cint, srcWidth: cint, srcHeight: cint, dstX: cint, dstY: cint, dstWidth: cint, dstHeight: cint, bufferMask: cint): void <cimport'rlBlitFramebuffer', cinclude'<rlgl.h>',nodecl> end
-function rlgl.bindFramebuffer(target: uint, framebuffer: uint): void <cimport'rlBindFramebuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.bindFramebuffer(target: cuint, framebuffer: cuint): void <cimport'rlBindFramebuffer', cinclude'<rlgl.h>',nodecl> end
 
 --------------------------------------------------------------------------------------------------------------------------
 
