@@ -1,3 +1,6 @@
+22/2/2025:
+- Clean up rlgl.nelua (Thank you, JoshuaWierenga!)
+
 25/1/2025:
 - Fix some mistakes in raylib.nelua
 
