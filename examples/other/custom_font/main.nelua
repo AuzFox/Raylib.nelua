@@ -10,8 +10,6 @@ rl.setTargetFPS(60)
 -- NOTE: We define a font base size of 32 pixels tall and up-to 250 characters
 local font = rl.loadFontEx("examples/other/custom_font/resources/NotoSans-Medium.ttf", 32, 0, 250)
 
-print(font.baseSize)
-
 while not rl.windowShouldClose() do
   rl.beginDrawing()
 
