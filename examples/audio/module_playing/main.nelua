@@ -7,6 +7,8 @@ local SCREEN_PADDING: uint8 <const> = 20
 
 local MAX_CIRCLES: uint8 <const> = 64
 
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+
 rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [audio] example - module playing (streaming)")
 
 rl.setTargetFPS(60)
