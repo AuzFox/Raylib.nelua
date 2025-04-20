@@ -1,0 +1,145 @@
+require "raylib"
+
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+
+local SCREEN_PADDING: uint8 <const> = 20
+
+local MAX_CIRCLES: uint8 <const> = 64
+
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [audio] example - module playing (streaming)")
+
+rl.setTargetFPS(60)
+
+rl.initAudioDevice()
+
+local colors: [14]rl.color = { rl.ORANGE, rl.RED, rl.GOLD, rl.LIME, rl.BLUE, rl.VIOLET, rl.BROWN, rl.LIGHTGRAY, rl.PINK, rl.YELLOW, rl.GREEN, rl.SKYBLUE, rl.PURPLE, rl.BEIGE }
+
+local CircleWave = @record {
+    position: rl.vector2,
+    radius: float32,
+    alpha: float32,
+    speed: float32,
+    color: rl.color
+}
+
+local circles: vector(CircleWave) = {}
+
+for i = MAX_CIRCLES, 1, -1 do
+    local alpha: float32 = 0.0
+    local radius: float32 = (@float32)(rl.getRandomValue(10, 40))
+
+    local intRadius = (@uint16)(radius)
+
+    local position: rl.vector2 = rl.vector2{x = rl.getRandomValue(intRadius, (SCREEN_WIDTH - intRadius)), y = rl.getRandomValue(intRadius, (SCREEN_HEIGHT - intRadius))}
+
+    local speed: float32 = rl.getRandomValue(1, 100) / 2000
+    local color: rl.color = colors[rl.getRandomValue(1, #colors - 1)]
+
+    circles:push(CircleWave{position, radius, alpha, speed, color})
+end
+
+local music: rl.music = rl.loadMusicStream("examples/audio/module_playing/resources/mini1111.xm")
+music.looping = false
+
+rl.playMusicStream(music)
+
+local pitch: float32 = 1.0
+local timePlayed: float32 = 0.0
+local pause: boolean = false
+
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+    -- Update
+    ------------------------------------------------------------------------------------
+    rl.updateMusicStream(music)      -- Update music buffer with new stream data
+
+    -- Restart music playing (stop and play)
+    if rl.isKeyPressed(rl.keyboardKey.SPACE) then
+        rl.stopMusicStream(music)
+        rl.playMusicStream(music)
+        pause = false
+    end
+
+    -- Pause/Resume music playing
+    if rl.isKeyPressed(rl.keyboardKey.P) then
+        pause = not pause
+        if pause then
+            rl.pauseMusicStream(music)
+        else
+            rl.resumeMusicStream(music)
+        end
+    end
+
+    if rl.isKeyDown(rl.keyboardKey.DOWN) and pitch ~= 0 then
+        pitch = pitch - 0.01
+        -- don't allow the pitch to go below 0
+        if pitch < 0 then
+            pitch = 0
+        end
+    end
+
+    if rl.isKeyDown(rl.keyboardKey.UP) then
+        pitch = pitch + 0.01
+    end
+
+    rl.setMusicPitch(music, pitch)
+
+    -- Get timePlayed scaled to bar dimensions
+    timePlayed = rl.getMusicTimePlayed(music) / rl.getMusicTimeLength(music) * (SCREEN_WIDTH - (SCREEN_PADDING * 2))
+
+    if not pause then
+        for i = 1, (MAX_CIRCLES - 1) do
+            circles[i].alpha = circles[i].alpha + circles[i].speed
+            circles[i].radius = circles[i].radius + circles[i].speed * 10.0
+
+            if circles[i].alpha > 1.0 then
+                circles[i].speed = circles[i].speed * -1
+            end
+
+            if circles[i].alpha <= 0.0 then
+                local alpha = 0.0
+
+                local radius: float32 = (@float32)(rl.getRandomValue(10, 40))
+                local intRadius = (@uint16)(radius)
+
+                local position: rl.vector2 = rl.vector2{x = rl.getRandomValue(intRadius, (SCREEN_WIDTH - intRadius)), y = rl.getRandomValue(intRadius, (SCREEN_HEIGHT - intRadius))}
+
+                local speed: float32 = rl.getRandomValue(1, 100) / 2000
+                local color: rl.color = colors[rl.getRandomValue(1, #colors - 1)]
+
+                circles[i].position = position
+                circles[i].radius = radius
+                circles[i].alpha = alpha
+                circles[i].speed = speed
+                circles[i].color = color
+            end
+        end
+    end
+
+    -- Draw
+    ------------------------------------------------------------------------------------
+    rl.drawing(function()
+        rl.clearBackground(rl.RAYWHITE)
+
+        for i = 1, (MAX_CIRCLES - 1) do
+            rl.drawCircleV(circles[i].position, circles[i].radius, rl.fade(circles[i].color, circles[i].alpha))
+        end
+
+        -- Draw time bar
+        rl.drawRectangle(SCREEN_PADDING, SCREEN_HEIGHT - SCREEN_PADDING - 12, SCREEN_WIDTH - (SCREEN_PADDING * 2), 12, rl.LIGHTGRAY)
+        rl.drawRectangle(SCREEN_PADDING, SCREEN_HEIGHT - SCREEN_PADDING - 12, (@uint16)(timePlayed), 12, rl.MAROON)
+        rl.drawRectangleLines(SCREEN_PADDING, SCREEN_HEIGHT - SCREEN_PADDING - 12, SCREEN_WIDTH - (SCREEN_PADDING * 2), 12, rl.GRAY)
+
+        -- Draw help instructions
+        rl.drawRectangle(SCREEN_PADDING, SCREEN_PADDING, 425, 145, rl.WHITE)
+        rl.drawRectangleLines(SCREEN_PADDING, SCREEN_PADDING, 425, 145, rl.GRAY)
+        rl.drawText("PRESS SPACE TO RESTART MUSIC", 40, 40, SCREEN_PADDING, rl.BLACK)
+        rl.drawText("PRESS P TO PAUSE/RESUME", 40, 70, SCREEN_PADDING, rl.BLACK)
+        rl.drawText("PRESS UP/DOWN TO CHANGE SPEED", 40, 100, SCREEN_PADDING, rl.BLACK)
+        rl.drawText(rl.textFormat("SPEED: %f", pitch), 40, 130, SCREEN_PADDING, rl.MAROON)
+    end)
+end
+
+rl.unloadMusicStream(music) -- Unload music stream buffers from RAM
+rl.closeAudioDevice() -- Close audio device (music streaming is automatically stopped)
+rl.closeWindow() -- Close window and OpenGL context
