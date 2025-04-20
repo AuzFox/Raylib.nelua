@@ -1263,7 +1263,7 @@ function rl.getPixelDataSize(width: cint, height: cint, format: cint): cint <cim
 -- Font loading/unloading functions
 function rl.getFontDefault(): rl.font <cimport'GetFontDefault', cinclude'<raylib.h>',nodecl> end
 function rl.loadFont(fileName: cstring): rl.font <cimport'LoadFont', cinclude'<raylib.h>',nodecl> end
-function rl.loadFontEx(fileName: cstring, fontSize: cint, fontChars: *cint, charsCount: cint): rl.font <cimport'LoadFontEx', cinclude'<raylib.h>',nodecl> end
+function rl.loadFontEx(fileName: cstring, fontSize: cint, fontChars: cint, charsCount: cint): rl.font <cimport'LoadFontEx', cinclude'<raylib.h>',nodecl> end
 function rl.loadFontFromImage(image: rl.image, key: rl.color, firstChar: cint): rl.font <cimport'LoadFontFromImage', cinclude'<raylib.h>',nodecl> end
 function rl.loadFontFromMemory(fileType: cstring, fileData: *cuchar, dataSize: cint, fontSize: cint, fontChars: *cint, charsCount: cint): rl.font <cimport'LoadFontFromMemory', cinclude'<raylib.h>',nodecl> end
 function rl.isFontValid(font: rl.font): boolean <cimport'IsFontValid', cinclude'<raylib.h>',nodecl> end
