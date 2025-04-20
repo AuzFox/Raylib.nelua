@@ -1,0 +1,62 @@
+require "raylib"
+
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [models] example - cube")
+rl.setTargetFPS(60)
+
+local Cube = @record {
+    w: float32,
+    h: float32,
+    len: float32,
+    position: rl.vector3,
+    color: rl.color,
+    scale: float32
+}
+
+-- cube
+local c = Cube{
+    1.0, -- w
+    1.0, -- h
+    1.0, -- len
+    rl.vector3{ x = 0.0, y = 0.0, z = 0.0}, -- position
+    rl.BLUE, -- color
+    1.0 -- scale
+}
+
+-- camera
+local camera = rl.camera3D{}
+camera.position = rl.vector3{ x = 3.0, y = 3.0, z = 3.0};
+camera.target = rl.vector3{ x = 0.0, y = 0.0, z = 0.0};
+camera.up = rl.vector3{ x = 0.0, y = 1.0, z = 0.0};
+camera.fovy = 30;
+camera.projection = rl.cameraProjection.PERSPECTIVE;
+
+local create_cube_model = function()
+    local mesh = rl.genMeshCube(c.w, c.h, c.len)
+    local model = rl.loadModelFromMesh(mesh)
+
+    return model
+end
+
+local model = create_cube_model()
+
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+    rl.beginDrawing()
+    rl.clearBackground(rl.RAYWHITE)
+
+    rl.beginMode3D(camera)
+    rl.drawModel(model, c.position, c.scale, c.color)
+    rl.endMode3D()
+
+    rl.endDrawing()
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.unloadModel(model)  -- Model unloading
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------
