@@ -44,8 +44,7 @@ local SCREEN_HEIGHT: uint16 <const> = SCREEN_WIDTH
 local GAME_SCREEN_WIDTH: uint16 <const> = 32
 local GAME_SCREEN_HEIGHT: uint16 <const> = GAME_SCREEN_WIDTH
 
--- rl.SetTraceLogLevel(rl.LOG_WARNING)
--- rl.SetConfigFlags(rl.FLAG_VSYNC_HINT)
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
 
 rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [other] example - my 32x32 game/demo")
 
