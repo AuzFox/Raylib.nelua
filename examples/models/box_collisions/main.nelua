@@ -1,0 +1,116 @@
+require "raylib"
+
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [models] example - box collisions")
+rl.setTargetFPS(60)
+
+-- camera
+local camera = rl.camera3D{}
+camera.position = rl.vector3{ x = 0.0, y = 10.0, z = 10.0}
+camera.target = rl.vector3{ x = 0.0, y = 0.0, z = 0.0}
+camera.up = rl.vector3{ x = 0.0, y = 1.0, z = 0.0}
+camera.fovy = 45
+-- camera.projection = rl.cameraProjection.PERSPECTIVE
+
+local playerPosition = rl.vector3{ x = 0.0, y = 1.0, z = 2.0 }
+local playerSize = rl.vector3{ x = 1.0, y = 2.0, z = 1.0 }
+local playerColor = rl.GREEN
+
+local enemyBoxPos = rl.vector3{ x = -4.0, y = 1.0, z = 0.0 }
+local enemyBoxSize = rl.vector3{ x = 2.0, y = 2.0, z = 2.0 }
+
+local enemySpherePos = rl.vector3{ x = 4.0, y = 0.0, z = 0.0 }
+local enemySphereSize = 1.5
+
+local collision = false
+
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+    if rl.isKeyDown(rl.keyboardKey.RIGHT) then
+        playerPosition.x = playerPosition.x + 0.2
+    end
+
+    if rl.isKeyDown(rl.keyboardKey.LEFT) then
+        playerPosition.x = playerPosition.x - 0.2
+    end
+
+    if rl.isKeyDown(rl.keyboardKey.DOWN) then
+        playerPosition.z = playerPosition.z + 0.2
+    end
+
+    if rl.isKeyDown(rl.keyboardKey.UP) then
+        playerPosition.z = playerPosition.z - 0.2
+    end
+
+    collision = false
+
+    local playerBox = rl.boundingBox{
+        rl.vector3{
+            x = playerPosition.x - playerSize.x/2,
+            y = playerPosition.y - playerSize.y/2,
+            z = playerPosition.z - playerSize.z/2
+        },
+        rl.vector3{
+            x = playerPosition.x + playerSize.x/2,
+            y = playerPosition.y + playerSize.y/2,
+            z = playerPosition.z + playerSize.z/2
+        }
+    }
+
+    local enemyBox = rl.boundingBox{
+        rl.vector3{
+            x = enemyBoxPos.x - enemyBoxSize.x/2,
+            y = enemyBoxPos.y - enemyBoxSize.y/2,
+            z = enemyBoxPos.z - enemyBoxSize.z/2
+        },
+        rl.vector3{
+            x = enemyBoxPos.x + enemyBoxSize.x/2,
+            y = enemyBoxPos.y + enemyBoxSize.y/2,
+            z = enemyBoxPos.z + enemyBoxSize.z/2
+        }
+    }
+
+    -- Check collisions player vs enemy-box
+    -- Check collisions player vs enemy-sphere
+    if rl.checkCollisionBoxes(playerBox, enemyBox) or rl.checkCollisionBoxSphere(playerBox, enemySpherePos, enemySphereSize) then
+        collision = true
+    end
+
+    if collision then
+        playerColor = rl.RED
+    else
+        playerColor = rl.GREEN
+    end
+
+    rl.beginDrawing()
+    rl.clearBackground(rl.RAYWHITE)
+
+    rl.beginMode3D(camera)
+
+    -- Draw enemy-box
+    rl.drawCube(enemyBoxPos, enemyBoxSize.x, enemyBoxSize.y, enemyBoxSize.z, rl.GRAY)
+    rl.drawCubeWires(enemyBoxPos, enemyBoxSize.x, enemyBoxSize.y, enemyBoxSize.z, rl.DARKGRAY)
+
+    -- Draw enemy-sphere
+    rl.drawSphere(enemySpherePos, enemySphereSize, rl.GRAY)
+    rl.drawSphereWires(enemySpherePos, enemySphereSize, 16, 16, rl.DARKGRAY)
+
+    -- Draw player
+    rl.drawCubeV(playerPosition, playerSize, playerColor)
+
+    rl.drawGrid(10, 1.0)        -- Draw a grid
+
+    rl.endMode3D()
+
+    rl.drawFPS()
+
+    rl.endDrawing()
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------
