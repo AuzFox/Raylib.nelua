@@ -1,0 +1,70 @@
+require "raylib"
+
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [textures] example - background scrolling")
+rl.setTargetFPS(60)
+
+local background = rl.loadTexture("examples/textures/background_scrolling/resources/cyberpunk_street_background.png")
+local midground = rl.loadTexture("examples/textures/background_scrolling/resources/cyberpunk_street_midground.png")
+local foreground = rl.loadTexture("examples/textures/background_scrolling/resources/cyberpunk_street_foreground.png")
+
+local scrollingBack = 0.0
+local scrollingMid = 0.0
+local scrollingFore = 0.0
+
+while not rl.windowShouldClose() do
+  scrollingBack = scrollingBack - 0.1
+  scrollingMid = scrollingMid - 0.5
+  scrollingFore = scrollingFore - 1.0
+
+  if scrollingBack <= -background.width * 2 then
+    scrollingBack = 0
+  end
+
+  if scrollingMid <= -midground.width * 2 then
+    scrollingMid = 0
+  end
+
+  if scrollingFore <= -foreground.width * 2 then
+    scrollingFore = 0
+  end
+
+  rl.beginDrawing()
+
+  rl.clearBackground(rl.getColor(0x052c46ff))
+  rl.clearBackground(rl.RAYWHITE)
+
+  -- Draw background image twice
+  -- NOTE: Texture is scaled twice its size
+  rl.drawTextureEx(background, rl.vector2({ x = scrollingBack, y = 20 }), 0.0, 2.0, rl.WHITE)
+  rl.drawTextureEx(background, rl.vector2({ x = background.width * 2 + scrollingBack, y = 20}), 0.0, 2.0, rl.WHITE)
+
+  --Draw midground image twice
+  rl.drawTextureEx(midground, rl.vector2({ x = scrollingMid, y = 20 }), 0.0, 2.0, rl.WHITE)
+  rl.drawTextureEx(midground, rl.vector2({ x = midground.width * 2 + scrollingMid, y = 20}), 0.0, 2.0, rl.WHITE)
+
+  -- Draw foreground image twice
+  rl.drawTextureEx(foreground, rl.vector2({ x = scrollingFore, y = 70 }), 0.0, 2.0, rl.WHITE)
+  rl.drawTextureEx(foreground, rl.vector2({ x = foreground.width * 2 + scrollingFore, y = 70 }), 0.0, 2.0, rl.WHITE)
+
+  rl.drawText("BACKGROUND SCROLLING & PARALLAX", 5, 5, 10, rl.RED)
+  rl.drawText(
+    "(c) Cyberpunk Street Environment by Luis Zuno (@ansimuz)",
+    SCREEN_WIDTH - 320,
+    SCREEN_HEIGHT - 20,
+    10,
+    rl.RAYWHITE
+  )
+
+  rl.endDrawing()
+end
+
+rl.unloadTexture(background)
+rl.unloadTexture(midground)
+rl.unloadTexture(foreground)
+
+rl.closeWindow()

@@ -1,0 +1,25 @@
+require "raylib"
+
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+
+rl.initWindow(800, 450, "Raylib.nelua [other] example - custom font")
+
+rl.setTargetFPS(60)
+
+-- TTF font : Font data and atlas are generated directly from TTF
+-- NOTE: We define a font base size of 32 pixels tall and up-to 250 characters
+local font = rl.loadFontEx("examples/other/custom_font/resources/NotoSans-Medium.ttf", 32, nilptr, 250)
+
+while not rl.windowShouldClose() do
+  rl.beginDrawing()
+
+  rl.drawFPS(10, 10)
+
+  rl.clearBackground(rl.RAYWHITE)
+  rl.drawTextEx(font, "Congrats! You created your first window!", rl.vector2({x = 174, y = 200}), font.baseSize, 0, rl.BLACK)
+
+  rl.endDrawing()
+end
+
+rl.unloadFont(font)
+rl.closeWindow()

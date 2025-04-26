@@ -1,0 +1,78 @@
+require "raylib"
+
+local SCREEN_WIDTH: uint16 <const> = 800
+local SCREEN_HEIGHT: uint16 <const> = 450
+
+rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib.nelua [models] example - billboard")
+rl.setTargetFPS(60)
+
+-- camera
+local camera = rl.camera3D{}
+camera.position = rl.vector3{ x = 5.0, y = 4.0, z = 5.0}
+camera.target = rl.vector3{ x = 0.0, y = 2.0, z = 0.0}
+camera.up = rl.vector3{ x = 0.0, y = 1.0, z = 0.0}
+camera.fovy = 45
+camera.projection = rl.cameraProjection.PERSPECTIVE
+
+-- Our billboard texture
+local bill = rl.loadTexture("examples/models/billboard/resources/billboard.png")
+local billPositionStatic = rl.vector3{ x = 0.0, y = 2.0, z = 0.0 }    -- Position of static billboard
+local billPositionRotating = rl.vector3{ x = 1.0, y = 2.0, z = 1.0 }  -- Position of rotating billboard
+
+-- Entire billboard texture, source is used to take a segment from a larger texture.
+local source = rl.rectangle{ 0.0, 0.0, (@float32)(bill.width), (@float32)(bill.height) }
+
+-- NOTE: Billboard locked on axis-Y
+local billUp = rl.vector3{ x = 0.0, y = 1.0, z = 0.0 }
+
+-- Set the height of the rotating billboard to 1.0 with the aspect ratio fixed
+local size = rl.vector2{ x = source.width/source.height, y = 1.0 }
+
+-- Rotate around origin
+-- Here we choose to rotate around the image center
+local origin = rl.vector2.scale(size, 0.5)
+
+-- Distance is needed for the correct billboard draw order
+-- Larger distance (further away from the camera) should be drawn prior to smaller distance.
+local distanceStatic = 0.0
+local distanceRotating = 0.0
+local rotation = 0.0
+
+while not rl.windowShouldClose() do        -- Detect window close button or ESC key
+    rl.updateCamera(camera, rl.cameraMode.ORBITAL)
+
+    rotation = rotation + 0.4
+    distanceStatic = rl.vector3.distance(camera.position, billPositionStatic)
+    distanceRotating = rl.vector3.distance(camera.position, billPositionRotating)
+
+    rl.beginDrawing()
+    rl.clearBackground(rl.RAYWHITE)
+
+    rl.beginMode3D(camera)
+
+    rl.drawGrid(10, 1.0)        -- Draw a grid
+
+    -- Draw order matters! Changes the order in which we
+    -- draw the smaller orbital model or the static model
+    if distanceStatic > distanceRotating then
+        rl.drawBillboard(camera, bill, billPositionStatic, 2.0, rl.WHITE)
+        rl.drawBillboardPro(camera, bill, source, billPositionRotating, billUp, size, origin, rotation, rl.WHITE)
+    else
+        rl.drawBillboardPro(camera, bill, source, billPositionRotating, billUp, size, origin, rotation, rl.WHITE)
+        rl.drawBillboard(camera, bill, billPositionStatic, 2.0, rl.WHITE)
+    end
+
+    rl.endMode3D()
+
+    rl.drawFPS()
+
+    rl.endDrawing()
+end
+
+-- De-Initialization
+-------------------------------------------------------------------------------------
+rl.unloadTexture(bill)  -- Texture unloading
+rl.closeWindow()       -- Close window and OpenGL context
+-------------------------------------------------------------------------------------
