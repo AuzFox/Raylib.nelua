@@ -156,6 +156,7 @@ global rlgl.renderBatch: type <cimport'rlRenderBatch', cinclude'<rlgl.h>',nodecl
 --------------------------------------------------------------------------------------------------------------------------
 
 global rlgl.glVersion: type <cimport'rlGlVersion', cinclude'<rlgl.h>',nodecl,using> = @enum(cint){
+  SOFTWARE = 0,
   OPENGL_11 = 1,
   OPENGL_21,
   OPENGL_33,
@@ -418,6 +419,9 @@ function rlgl.disableScissorTest(): void <cimport'rlDisableScissorTest', cinclud
 function rlgl.scissor(x: cint, y: cint, width: cint, height: cint): void <cimport'rlScissor', cinclude'<rlgl.h>',nodecl> end
 function rlgl.enableWireMode(): void <cimport'rlEnableWireMode', cinclude'<rlgl.h>',nodecl> end
 function rlgl.enablePointMode(): void <cimport'rlEnablePointMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.disablePointMode(): void <cimport'rlDisablePointMode', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setPointSize(size: float32): void <cimport'rlSetPointSize', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getPointSize(): float32 <cimport'rlGetPointSize', cinclude'<rlgl.h>',nodecl> end
 function rlgl.disableWireMode(): void <cimport'rlDisableWireMode', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setLineWidth(width: float32): void <cimport'rlSetLineWidth', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getLineWidth(): float32 <cimport'rlGetLineWidth', cinclude'<rlgl.h>',nodecl> end
@@ -440,6 +444,7 @@ function rlgl.setBlendFactorsSeparate(glSrcRGB: cint, glDstRGB: cint, glSrcAlpha
 function rlgl.init(width: cint, height: cint): void <cimport'rlglInit', cinclude'<rlgl.h>',nodecl> end
 function rlgl.close(): void <cimport'rlglClose', cinclude'<rlgl.h>',nodecl> end
 function rlgl.loadExtensions(loader: pointer): void <cimport'rlLoadExtensions', cinclude'<rlgl.h>',nodecl> end
+function rlgl.getProcAddress(procName: cstring): pointer <cimport'rlGetProcAddress', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getVersion(): cint <cimport'rlGetVersion', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setFramebufferWidth(width: cint): void <cimport'rlSetFramebufferWidth', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getFramebufferWidth(): cint <cimport'rlGetFramebufferWidth', cinclude'<rlgl.h>',nodecl> end
@@ -485,7 +490,7 @@ function rlgl.drawVertexArrayElementsInstanced(offset: cint, count: cint, buffer
 -- Textures management
 function rlgl.loadTexture(data: pointer, width: cint, height: cint, format: cint, mipmapCount: cint): cuint <cimport'rlLoadTexture', cinclude'<rlgl.h>',nodecl> end
 function rlgl.loadTextureDepth(width: cint, height: cint, useRenderBuffer: boolean): cuint <cimport'rlLoadTextureDepth', cinclude'<rlgl.h>',nodecl> end
-function rlgl.loadTextureCubemap(data: pointer, size: cint, format: cint): cuint <cimport'rlLoadTextureCubemap', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadTextureCubemap(data: pointer, size: cint, format: cint, mipmapCount: cint): cuint <cimport'rlLoadTextureCubemap', cinclude'<rlgl.h>',nodecl> end
 function rlgl.updateTexture(id: cuint, offsetX: cint, offsetY: cint, width: cint, height: cint, format: cint, data: pointer): void <cimport'rlUpdateTexture', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getGlTextureFormats(format: cint, glInternalFormat: *cuint, glFormat: *cuint, glType: *cuint): void <cimport'rlGetGlTextureFormats', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getPixelFormatName(format: cuint): cstring <cimport'rlGetPixelFormatName', cinclude'<rlgl.h>',nodecl> end
@@ -501,25 +506,30 @@ function rlgl.loadFramebuffer(): cuint <cimport'rlLoadFramebuffer', cinclude'<rl
 function rlgl.framebufferAttach(fboId: cuint, texId: cuint, attachType: cint, texType: cint, mipLevel: cint): void <cimport'rlFramebufferAttach', cinclude'<rlgl.h>',nodecl> end
 function rlgl.framebufferComplete(id: cuint): boolean <cimport'rlFramebufferComplete', cinclude'<rlgl.h>',nodecl> end
 function rlgl.unloadFramebuffer(id: cuint): void <cimport'rlUnloadFramebuffer', cinclude'<rlgl.h>',nodecl> end
+-- WARNING: Copy and resize framebuffer functionality only defined for software backend
+function rlgl.copyFramebuffer(x: cint, y: cint, width: cint, height: cint, format: cint, pixels: pointer): void <cimport'rlCopyFramebuffer', cinclude'<rlgl.h>',nodecl> end
+function rlgl.resizeFramebuffer(width: cint, height: cint): void <cimport'rlResizeFramebuffer', cinclude'<rlgl.h>',nodecl> end
 
 --------------------------------------------------------------------------------------------------------------------------
 
 -- Shaders management
-function rlgl.loadShaderCode(vsCode: cstring, fsCode: cstring): cuint <cimport'rlLoadShaderCode', cinclude'<rlgl.h>',nodecl> end
-function rlgl.compileShader(shaderCode: cstring, type: cint): cuint <cimport'rlCompileShader', cinclude'<rlgl.h>',nodecl> end
-function rlgl.loadShaderProgram(vShaderId: cuint, fShaderId: cuint): cuint <cimport'rlLoadShaderProgram', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadShader(code: cstring, type: cint): cuint <cimport'rlLoadShader', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadShaderProgram(vsCode: cstring, fsCode: cstring): cuint <cimport'rlLoadShaderProgram', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadShaderProgramEx(vsId: cuint, fsId: cuint): cuint <cimport'rlLoadShaderProgramEx', cinclude'<rlgl.h>',nodecl> end
+function rlgl.loadShaderProgramCompute(csId: cuint): cuint <cimport'rlLoadShaderProgramCompute', cinclude'<rlgl.h>',nodecl> end
+function rlgl.unloadShader(id: cuint): void <cimport'rlUnloadShader', cinclude'<rlgl.h>',nodecl> end
 function rlgl.unloadShaderProgram(id: cuint): void <cimport'rlUnloadShaderProgram', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getLocationUniform(shaderId: cuint, uniformName: cstring): cint <cimport'rlGetLocationUniform', cinclude'<rlgl.h>',nodecl> end
 function rlgl.getLocationAttrib(shaderId: cuint, attribName: cstring): cint <cimport'rlGetLocationAttrib', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setUniform(locIndex: cint, value: pointer, uniformType: cint, count: cint): void <cimport'rlSetUniform', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setUniformMatrix(locIndex: cint, mat: rl.matrix): void <cimport'rlSetUniformMatrix', cinclude'<rlgl.h>',nodecl> end
+function rlgl.setUniformMatrices(locIndex: cint, mat: *rl.matrix, count: cint): void <cimport'rlSetUniformMatrices', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setUniformSampler(locIndex: cint, textureId: cuint): void <cimport'rlSetUniformSampler', cinclude'<rlgl.h>',nodecl> end
 function rlgl.setShader(id: cuint, locs: *cint): void <cimport'rlSetShader', cinclude'<rlgl.h>',nodecl> end
 
 --------------------------------------------------------------------------------------------------------------------------
 
 -- Compute shader management
-function rlgl.loadComputeShaderProgram(shaderId: cuint): cuint <cimport'rlLoadComputeShaderProgram', cinclude'<rlgl.h>',nodecl> end
 function rlgl.computeShaderDispatch(groupX: cuint, groupY: cuint, groupZ: cuint): void <cimport'rlComputeShaderDispatch', cinclude'<rlgl.h>',nodecl> end
 
 --------------------------------------------------------------------------------------------------------------------------
