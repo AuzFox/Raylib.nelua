@@ -1,3 +1,6 @@
+23/9/2026:
+- Update raylib.nelua, rlgl.nelua, raygui.nelua, and rcamera.nelua to version 6.1-dev (Thank you, lourime!)
+
 25/4/2025:
 - Added some examples (Thank you, james2doyle!)
 
