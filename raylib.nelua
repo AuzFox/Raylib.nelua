@@ -42,13 +42,13 @@ end
 global rl = @record{}
 
 global rl.VERSION_MAJOR <const> = 6
-global rl.VERSION_MINOR <const> = 1
+global rl.VERSION_MINOR <const> = 2
 global rl.VERSION_PATCH <const> = 0
-global rl.VERSION <const> = "6.1-dev"
+global rl.VERSION <const> = "6.2"
 
 -- Emscripten main loop function.
 ## if PLATFORM_WEB then
-function rl.wasmSetMainLoop(func: function(), fps: cint, simulate_infinite_loop: cint) <cimport'emscripten_set_main_loop',cinclude'<emscripten.h>',nodecl> end
+function rl.wasmSetMainLoop(func: function(), fps: cint, simulateInfiniteLoop: cint) <cimport'emscripten_set_main_loop',cinclude'<emscripten.h>',nodecl> end
 ## end
 
 ------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ global rl.vector2: type <cimport'Vector2', cinclude'<raylib.h>',nodecl> = @recor
 }
 
 ## rl.value.metafields.vector2.value.is_vector2 = true
-local rl.vector2_or_scalar_concept = #[concept(function(attr)
+local rl.vector2OrScalarConcept = #[concept(function(attr)
     -- match in case of scalar or Vec2
     return attr.type.is_scalar or attr.type.is_vector2
 end)]#
@@ -75,7 +75,7 @@ global rl.vector3: type <cimport'Vector3', cinclude'<raylib.h>',nodecl> = @recor
 }
 
 ## rl.value.metafields.vector3.value.is_vector3 = true
-local rl.vector3_or_scalar_concept = #[concept(function(attr)
+local rl.vector3OrScalarConcept = #[concept(function(attr)
     -- match in case of scalar or Vec3
     return attr.type.is_scalar or attr.type.is_vector3
 end)]#
@@ -132,7 +132,7 @@ global rl.texture: type <cimport'Texture', cinclude'<raylib.h>',nodecl> = @recor
     width: cint,                                            -- Texture base width
     height: cint,                                           -- Texture base height
     mipmaps: cint,                                          -- Mipmap levels, 1 by default
-    format: cuint                                           -- Data format (pixelFormat type)
+    format: cint                                            -- Data format (pixelFormat type)
 }
 
 -- Texture2D, same as texture
@@ -543,7 +543,11 @@ global rl.keyboardKey: type <cimport'KeyboardKey', cinclude'<raylib.h>',nodecl,u
 global rl.mouseButton: type <cimport'MouseButton', cinclude'<raylib.h>',nodecl,using> = @enum(cint){
     LEFT_BUTTON = 0,
     RIGHT_BUTTON = 1,
-    MIDDLE_BUTTON = 2
+    MIDDLE_BUTTON = 2,
+    SIDE_BUTTON = 3,
+    EXTRA_BUTTON = 4,
+    FORWARD_BUTTON = 5,
+    BACK_BUTTON = 6
 }
 
 -- Mouse cursor
@@ -602,10 +606,10 @@ global rl.materialMapIndex: type <cimport'MaterialMapIndex', cinclude'<raylib.h>
     OCCLUSION = 4,
     EMISSION = 5,
     HEIGHT = 6,
-    BRDG = 7,
-    CUBEMAP = 8,
-    IRRADIANCE = 9,
-    PREFILTER = 10
+    CUBEMAP = 7,
+    IRRADIANCE = 8,
+    PREFILTER = 9,
+    BRDF = 10
 }
 
 -- Shader location index
@@ -619,7 +623,7 @@ global rl.shaderLocationIndex: type <cimport'ShaderLocationIndex', cinclude'<ray
     MATRIX_MVP = 6,
     MATRIX_VIEW = 7,
     MATRIX_PROJECTION = 8,
-    MATRIX_model = 9,
+    MATRIX_MODEL = 9,
     MATRIX_NORMAL = 10,
     VECTOR_VIEW = 11,
     COLOR_DIFFUSE = 12,
@@ -771,7 +775,7 @@ global rl.cameraProjection: type <cimport'CameraProjection', cinclude'<raylib.h>
 }
 
 -- N-patch layout
-global nPatchLayout: type <cimport'NPatchLayout', cinclude'<raylib.h>',nodecl,using> = @enum(cint){
+global rl.nPatchLayout: type <cimport'NPatchLayout', cinclude'<raylib.h>',nodecl,using> = @enum(cint){
     NINE_PATCH = 0,
     THREE_PATCH_VERTICAL = 1,
     THREE_PATCH_HORIZONTAL = 2
@@ -797,7 +801,7 @@ function rl.isWindowFocused(): boolean <cimport'IsWindowFocused', cinclude'<rayl
 function rl.isWindowResized(): boolean <cimport'IsWindowResized', cinclude'<raylib.h>', nodecl> end -- Check if window has been resized
 function rl.isWindowState(flag: cuint): boolean <cimport'IsWindowState', cinclude'<raylib.h>', nodecl> end -- Check if one specific window flag is enabled
 function rl.setWindowState(flags: cuint): void <cimport'SetWindowState', cinclude'<raylib.h>', nodecl> end -- Set window configuration state using flags (only PLATFORM_DESKTOP)
-function rl.clearWindowState(): void <cimport'SetWindowState', cinclude'<raylib.h>', nodecl> end -- Clear window configuration state flags
+function rl.clearWindowState(flags: cuint): void <cimport'ClearWindowState', cinclude'<raylib.h>', nodecl> end -- Clear window configuration state flags
 function rl.isWindowHidden(): boolean <cimport'IsWindowHidden', cinclude'<raylib.h>', nodecl> end -- Check if window is currently hidden
 function rl.isWindowFullscreen(): boolean <cimport'IsWindowFullscreen', cinclude'<raylib.h>', nodecl> end -- Check if window is currently fullscreen
 function rl.toggleFullscreen(): void <cimport'ToggleFullscreen', cinclude'<raylib.h>', nodecl> end -- Toggle fullscreen mode (only PLATFORM_DESKTOP)
@@ -865,8 +869,8 @@ function rl.beginVrStereoMode(config: rl.vrStereoConfig): void <cimport'BeginVrS
 function rl.endVrStereoMode(): void <cimport'EndVrStereoMode', cinclude'<raylib.h>',nodecl> end
 
 -- VR stereo config functions for VR simulator
-function rl.loadvrStereoConfig(device: rl.vrDeviceInfo): rl.vrStereoConfig <cimport'LoadvrStereoConfig', cinclude'<raylib.h>',nodecl> end
-function rl.unloadvrStereoConfig(config: rl.vrStereoConfig): void <cimport'UnloadvrStereoConfig', cinclude'<raylib.h>',nodecl> end
+function rl.loadVrStereoConfig(device: rl.vrDeviceInfo): rl.vrStereoConfig <cimport'LoadVrStereoConfig', cinclude'<raylib.h>',nodecl> end
+function rl.unloadVrStereoConfig(config: rl.vrStereoConfig): void <cimport'UnloadVrStereoConfig', cinclude'<raylib.h>',nodecl> end
 
 -- shader management functions
 -- NOTE: shader functionality is not available on OpenGL 1.1
@@ -887,8 +891,9 @@ function rl.getScreenToWorldRayEx(position: rl.vector2, camera: rl.camera, width
 function rl.getWorldToScreen(position: rl.vector3, camera: rl.camera): rl.vector2 <cimport'GetWorldToScreen', cinclude'<raylib.h>',nodecl> end
 function rl.getWorldToScreenEx(position: rl.vector3, camera: rl.camera, width: cint, height: cint): rl.vector2 <cimport'GetWorldToScreenEx', cinclude'<raylib.h>',nodecl> end
 function rl.getWorldToScreen2D(position: rl.vector2, camera: rl.camera2D): rl.vector2 <cimport'GetWorldToScreen2D', cinclude'<raylib.h>',nodecl> end
-function rl.getcameraMatrix(camera: rl.camera): rl.matrix <cimport'GetcameraMatrix', cinclude'<raylib.h>',nodecl> end
-function rl.getcameraMatrix2D(camera: rl.camera2D): rl.matrix <cimport'GetcameraMatrix2D', cinclude'<raylib.h>',nodecl> end
+function rl.getScreenToWorld2D(position: rl.vector2, camera: rl.camera2D): rl.vector2 <cimport'GetScreenToWorld2D', cinclude'<raylib.h>',nodecl> end
+function rl.getCameraMatrix(camera: rl.camera): rl.matrix <cimport'GetCameraMatrix', cinclude'<raylib.h>',nodecl> end
+function rl.getCameraMatrix2D(camera: rl.camera2D): rl.matrix <cimport'GetCameraMatrix2D', cinclude'<raylib.h>',nodecl> end
 
 -- Timing-related functions
 function rl.setTargetFPS(fps: cint): void <cimport'SetTargetFPS', cinclude'<raylib.h>',nodecl> end
@@ -901,7 +906,7 @@ function rl.getFPS(): cint <cimport'GetFPS', cinclude'<raylib.h>',nodecl> end
 -- By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timing + PollInputEvents()
 function rl.swapScreenBuffer(): void <cimport'SwapScreenBuffer', cinclude'<raylib.h>', nodecl> end
 function rl.pollInputEvents(): void <cimport'PollInputEvents', cinclude'<raylib.h>', nodecl> end
-function rl.waitTime(ms: float32): void <cimport'WaitTime', cinclude'<raylib.h>', nodecl> end
+function rl.waitTime(seconds: float64): void <cimport'WaitTime', cinclude'<raylib.h>', nodecl> end
 
 -- Random values generation functions
 function rl.setRandomSeed(seed: cuint): void <cimport'SetRandomSeed', cinclude'<raylib.h>', nodecl> end -- Set the seed for the random number generator
@@ -916,8 +921,8 @@ function rl.openURL(url: cstring): void <cimport'OpenURL', cinclude'<raylib.h>',
 
 function rl.traceLog(logLevel: cint, text: cstring, ...: cvarargs): void <cimport'TraceLog', cinclude'<raylib.h>',nodecl> end
 function rl.setTraceLogLevel(logLevel: cint): void <cimport'SetTraceLogLevel', cinclude'<raylib.h>',nodecl> end
-function rl.memAlloc(size: cint): pointer <cimport'MemAlloc', cinclude'<raylib.h>',nodecl> end
-function rl.memRealloc(ptr: pointer, size: cint): pointer <cimport'MemRealloc', cinclude'<raylib.h>',nodecl> end
+function rl.memAlloc(size: cuint): pointer <cimport'MemAlloc', cinclude'<raylib.h>',nodecl> end
+function rl.memRealloc(ptr: pointer, size: cuint): pointer <cimport'MemRealloc', cinclude'<raylib.h>',nodecl> end
 function rl.memFree(ptr: pointer): void <cimport'MemFree', cinclude'<raylib.h>',nodecl> end
 
 -- Set custom callbacks
@@ -932,9 +937,9 @@ function rl.setSaveFileTextCallback(callback: rl.saveFileTextCallback): void <ci
 function rl.loadFileData(fileName: cstring, dataSize: *cint): *cuchar <cimport'LoadFileData', cinclude'<raylib.h>',nodecl> end
 function rl.unloadFileData(data: *cuchar): void <cimport'UnloadFileData', cinclude'<raylib.h>',nodecl> end
 function rl.saveFileData(fileName: cstring, data: pointer, dataSize: cint): boolean <cimport'SaveFileData', cinclude'<raylib.h>',nodecl> end
-function rl.exportDataAsCode(data: cstring, dataSize: cint, fileName: cstring): boolean <cimport'ExportDataAsCode', cinclude'<raylib.h>',nodecl> end
+function rl.exportDataAsCode(data: *cuchar, dataSize: cint, fileName: cstring): boolean <cimport'ExportDataAsCode', cinclude'<raylib.h>',nodecl> end
 function rl.loadFileText(fileName: cstring): cstring <cimport'LoadFileText', cinclude'<raylib.h>',nodecl> end
-function rl.unloadFileText(text: *cuchar): void <cimport'UnloadFileText', cinclude'<raylib.h>',nodecl> end
+function rl.unloadFileText(text: cstring): void <cimport'UnloadFileText', cinclude'<raylib.h>',nodecl> end
 function rl.saveFileText(fileName: cstring, text: cstring): boolean <cimport'SaveFileText', cinclude'<raylib.h>',nodecl> end
 
 -- File system functions
@@ -967,7 +972,7 @@ function rl.loadDirectoryFiles(dir: cstring): rl.filePathList <cimport'LoadDirec
 function rl.loadDirectoryFilesEx(basePath: cstring, filter: cstring, scanSubDirs: boolean): rl.filePathList <cimport'LoadDirectoryFilesEx', cinclude'<raylib.h>',nodecl> end
 function rl.unloadDirectoryFiles(files: rl.filePathList): void <cimport'UnloadDirectoryFiles', cinclude'<raylib.h>',nodecl> end
 function rl.isFileDropped(): boolean <cimport'IsFileDropped', cinclude'<raylib.h>',nodecl> end
-function rl.LoadDroppedFiles(files: rl.filePathList): void <cimport'LoadDroppedFiles', cinclude'<raylib.h>',nodecl> end
+function rl.loadDroppedFiles(): rl.filePathList <cimport'LoadDroppedFiles', cinclude'<raylib.h>',nodecl> end
 function rl.unloadDroppedFiles(files: rl.filePathList): void <cimport'UnloadDroppedFiles', cinclude'<raylib.h>',nodecl> end
 function rl.getDirectoryFileCount(dirPath: cstring): cuint <cimport'GetDirectoryFileCount', cinclude'<raylib.h>',nodecl> end
 function rl.getDirectoryFileCountEx(basePath: cstring, filter: cstring, scanSubdirs: boolean): cuint <cimport'GetDirectoryFileCountEx', cinclude'<raylib.h>',nodecl> end
@@ -1041,8 +1046,8 @@ function rl.setMouseCursor(cursor: cint): void <cimport'SetMouseCursor', cinclud
 function rl.getTouchX(): cint <cimport'GetTouchX', cinclude'<raylib.h>',nodecl> end
 function rl.getTouchY(): cint <cimport'GetTouchY', cinclude'<raylib.h>',nodecl> end
 function rl.getTouchPosition(index: cint): rl.vector2 <cimport'GetTouchPosition', cinclude'<raylib.h>',nodecl> end
-function rl.getTouchPointID(index: cint): cint <cimport'GetTouchPosition', cinclude'<raylib.h>',nodecl> end
-function rl.getTouchPointsCount(): cint <cimport'GetTouchPosition', cinclude'<raylib.h>',nodecl> end
+function rl.getTouchPointID(index: cint): cint <cimport'GetTouchPointId', cinclude'<raylib.h>',nodecl> end
+function rl.getTouchPointsCount(): cint <cimport'GetTouchPointCount', cinclude'<raylib.h>',nodecl> end
 
 --------------------------------------------------------------------------------------
 -- Gestures and Touch Handling Functions (Module: rgestures)
@@ -1106,7 +1111,7 @@ function rl.drawRectangleGradientV(posX: cint, posY: cint, width: cint, height: 
 function rl.drawRectangleGradientH(posX: cint, posY: cint, width: cint, height: cint, left: rl.color, right: rl.color): void <cimport'DrawRectangleGradientH', cinclude'<raylib.h>',nodecl> end
 function rl.drawRectangleGradientEx(rec: rl.rectangle, topLeft: rl.color, bottomLeft: rl.color, topRight: rl.color, bottomRight: rl.color): void <cimport'DrawRectangleGradientEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawRectangleLines(posX: cint, posY: cint, width: cint, height: cint, color: rl.color): void <cimport'DrawRectangleLines', cinclude'<raylib.h>',nodecl> end
-function rl.drawRectangleLinesEx(rec: rl.rectangle, lineThick: cint, color: rl.color): void <cimport'DrawRectangleLinesEx', cinclude'<raylib.h>',nodecl> end
+function rl.drawRectangleLinesEx(rec: rl.rectangle, thick: float32, color: rl.color): void <cimport'DrawRectangleLinesEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawRectangleRounded(rec: rl.rectangle, roundness: float32, segments: cint, color: rl.color): void <cimport'DrawRectangleRounded', cinclude'<raylib.h>',nodecl> end
 function rl.drawRectangleRoundedLines(rec: rl.rectangle, roundness: float32, segments: cint, color: rl.color): void <cimport'DrawRectangleRoundedLines', cinclude'<raylib.h>',nodecl> end
 function rl.drawRectangleRoundedLinesEx(rec: rl.rectangle, roundness: float32, segments: cint, lineThick: float32, color: rl.color): void <cimport'DrawRectangleRoundedLinesEx', cinclude'<raylib.h>',nodecl> end
@@ -1147,7 +1152,7 @@ function rl.checkCollisionCircleLine(center: rl.vector2, radius: float32, p1: rl
 function rl.checkCollisionPointRec(point: rl.vector2, rec: rl.rectangle): boolean <cimport'CheckCollisionPointRec', cinclude'<raylib.h>',nodecl> end
 function rl.checkCollisionPointCircle(point: rl.vector2, center: rl.vector2, radius: float32): boolean <cimport'CheckCollisionPointCircle', cinclude'<raylib.h>',nodecl> end
 function rl.checkCollisionPointTriangle(point: rl.vector2, p1: rl.vector2, p2: rl.vector2, p3: rl.vector2): boolean <cimport'CheckCollisionPointTriangle', cinclude'<raylib.h>',nodecl> end
-function rl.checkCollisionPointPoly(point: rl.vector2, p1: rl.vector2, p2: rl.vector2, p3: rl.vector2): boolean <cimport'CheckCollisionPointPoly', cinclude'<raylib.h>',nodecl> end
+function rl.checkCollisionPointPoly(point: rl.vector2, points: *[0]rl.vector2, pointCount: cint): boolean <cimport'CheckCollisionPointPoly', cinclude'<raylib.h>',nodecl> end
 function rl.checkCollisionLines(startPos1: rl.vector2, endPos1: rl.vector2, startPos2: rl.vector2, endPos2: rl.vector2, collisionPoint: *rl.vector2): boolean <cimport'CheckCollisionLines', cinclude'<raylib.h>',nodecl> end
 function rl.checkCollisionPointLine(point: rl.vector2, p1: rl.vector2, p2: rl.vector2, threshold: cint): boolean <cimport'CheckCollisionPointLine', cinclude'<raylib.h>',nodecl> end
 function rl.getCollisionRec(rec1: rl.rectangle, rec2: rl.rectangle): rl.rectangle <cimport'GetCollisionRec', cinclude'<raylib.h>',nodecl> end
@@ -1162,10 +1167,9 @@ function rl.loadImage(fileName: cstring): rl.image <cimport'LoadImage', cinclude
 function rl.loadImageRaw(fileName: cstring, width: cint, height: cint, format: cint, headerSize: cint): rl.image <cimport'LoadImageRaw', cinclude'<raylib.h>',nodecl> end
 function rl.loadImageAnim(fileName: cstring, frames: *cint): rl.image <cimport'LoadImageAnim', cinclude'<raylib.h>',nodecl> end
 function rl.loadImageAnimFromMemory(fileType: cstring, fileData: *cuchar, dataSize: cint, frames: *cint): rl.image <cimport'LoadImageAnimFromMemory', cinclude'<raylib.h>',nodecl> end
-function rl.loadImageSvg(fileNameOrString: cstring, width: cint, height: cint): rl.image <cimport'LoadImageSvg', cinclude'<raylib.h>',nodecl> end
 function rl.loadImageFromMemory(fileType: cstring, fileData: *cuchar, dataSize: cint): rl.image <cimport'LoadImageFromMemory', cinclude'<raylib.h>',nodecl> end
 function rl.loadImageFromTexture(texture: rl.texture2D): rl.image <cimport'LoadImageFromTexture', cinclude'<raylib.h>',nodecl> end
-function rl.loadImageFromScreen(void): rl.image <cimport'LoadImageFromScreen', cinclude'<raylib.h>',nodecl> end
+function rl.loadImageFromScreen(): rl.image <cimport'LoadImageFromScreen', cinclude'<raylib.h>',nodecl> end
 function rl.isImageValid(image: rl.image): boolean <cimport'IsImageValid', cinclude'<raylib.h>',nodecl> end
 function rl.unloadImage(image: rl.image): void <cimport'UnloadImage', cinclude'<raylib.h>',nodecl> end
 function rl.exportImage(image: rl.image, fileName: cstring): boolean <cimport'ExportImage', cinclude'<raylib.h>',nodecl> end
@@ -1227,8 +1231,8 @@ function rl.imageClearBackground(dst: *rl.image, color: rl.color): void <cimport
 function rl.imageDrawPixel(dst: *rl.image, posX: cint, posY: cint, color: rl.color): void <cimport'ImageDrawPixel', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawPixelV(dst: *rl.image, position: rl.vector2, color: rl.color): void <cimport'ImageDrawPixelV', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawLine(dst: *rl.image, startPosX: cint, startPosY: cint, endPosX: cint, endPosY: cint, color: rl.color): void <cimport'ImageDrawLine', cinclude'<raylib.h>',nodecl> end
-function rl.imageDrawLineV(dst: *rl.image, start: rl.vector2, End: rl.vector2, color: rl.color): void <cimport'ImageDrawLineV', cinclude'<raylib.h>',nodecl> end
-function rl.imageDrawLineEx(dst: *rl.image, start: rl.vector2, End: rl.vector2, thick: cint, color: rl.color): void <cimport'ImageDrawLineEx', cinclude'<raylib.h>',nodecl> end
+function rl.imageDrawLineV(dst: *rl.image, start: rl.vector2, ending: rl.vector2, color: rl.color): void <cimport'ImageDrawLineV', cinclude'<raylib.h>',nodecl> end
+function rl.imageDrawLineEx(dst: *rl.image, start: rl.vector2, ending: rl.vector2, thick: cint, color: rl.color): void <cimport'ImageDrawLineEx', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawLineStrip(dst: *rl.image, points: *rl.vector2, pointCount: cint, color: rl.color): void <cimport'ImageDrawLineStrip', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawCircle(dst: *rl.image, centerX: cint, centerY: cint, radius: cint, color: rl.color): void <cimport'ImageDrawCircle', cinclude'<raylib.h>',nodecl> end
 function rl.imageDrawCircleV(dst: *rl.image, center: rl.vector2, radius: cint, color: rl.color): void <cimport'ImageDrawCircleV', cinclude'<raylib.h>',nodecl> end
@@ -1296,7 +1300,7 @@ function rl.colorContrast(color: rl.color, contrast: float32): rl.color <cimport
 function rl.colorAlpha(color: rl.color, alpha: float32): rl.color <cimport'ColorAlpha', cinclude'<raylib.h>',nodecl> end
 function rl.colorAlphaBlend(dst: rl.color, src: rl.color, tint: rl.color): rl.color <cimport'ColorAlphaBlend', cinclude'<raylib.h>',nodecl> end
 function rl.colorLerp(color1: rl.color, color2: rl.color, factor: float32): rl.color <cimport'ColorLerp', cinclude'<raylib.h>',nodecl> end
-function rl.getColor(hexValue: cint): rl.color <cimport'GetColor', cinclude'<raylib.h>',nodecl> end
+function rl.getColor(hexValue: cuint): rl.color <cimport'GetColor', cinclude'<raylib.h>',nodecl> end
 function rl.getPixelColor(srcPtr: pointer, format: cint): rl.color <cimport'GetPixelColor', cinclude'<raylib.h>',nodecl> end
 function rl.setPixelColor(dstPtr: pointer, color: rl.color, format: cint): void <cimport'SetPixelColor', cinclude'<raylib.h>',nodecl> end
 function rl.getPixelDataSize(width: cint, height: cint, format: cint): cint <cimport'GetPixelDataSize', cinclude'<raylib.h>',nodecl> end
@@ -1324,7 +1328,7 @@ function rl.drawText(text: cstring, posX: cint, posY: cint, fontSize: cint, colo
 function rl.drawTextEx(font: rl.font, text: cstring, position: rl.vector2, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawTextPro(font: rl.font, text: cstring, position: rl.vector2, origin: rl.vector2, rotation: float32, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextPro', cinclude'<raylib.h>',nodecl> end
 function rl.drawTextCodepoint(font: rl.font, codepoint: cint, position: rl.vector2, fontSize: float32, tint: rl.color): void <cimport'DrawTextCodepoint', cinclude'<raylib.h>',nodecl> end
-function rl.drawTextCodepoints(font: rl.font, codepoints: cint, count: cint, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextCodepoints', cinclude'<raylib.h>',nodecl> end
+function rl.drawTextCodepoints(font: rl.font, codepoints: *cint, codepointCount: cint, position: rl.vector2, fontSize: float32, spacing: float32, tint: rl.color): void <cimport'DrawTextCodepoints', cinclude'<raylib.h>',nodecl> end
 
 -- Text font info functions
 function rl.setTextLineSpacing(spacing: cint): void <cimport'SetTextLineSpacing', cinclude'<raylib.h>',nodecl> end
@@ -1332,18 +1336,18 @@ function rl.measureText(text: cstring, fontSize: cint): cint <cimport'MeasureTex
 function rl.measureTextEx(font: rl.font, text: cstring, fontSize: float32, spacing: float32): rl.vector2 <cimport'MeasureTextEx', cinclude'<raylib.h>',nodecl> end
 function rl.measureTextCodepoints(font: rl.font, codepoints: *cint, length: cint, fontSize: float32, spacing: float32): rl.vector2 <cimport'MeasureTextCodepoints', cinclude'<raylib.h>',nodecl> end
 function rl.getGlyphIndex(font: rl.font, codepoint: cint): cint <cimport'GetGlyphIndex', cinclude'<raylib.h>',nodecl> end
-function rl.getglyphInfo(font: rl.font, codepoint: cint): rl.glyphInfo <cimport'GetglyphInfo', cinclude'<raylib.h>',nodecl> end
+function rl.getGlyphInfo(font: rl.font, codepoint: cint): rl.glyphInfo <cimport'GetGlyphInfo', cinclude'<raylib.h>',nodecl> end
 function rl.getGlyphAtlasRec(font: rl.font, codepoint: cint): rl.rectangle<cimport'GetGlyphAtlasRec', cinclude'<raylib.h>',nodecl> end
 
 -- Text codepoints management functions (unicode characters)
-function rl.loadCodepoints(text: cstring, count: *cint): cint <cimport'LoadCodepoints', cinclude'<raylib.h>',nodecl> end
+function rl.loadCodepoints(text: cstring, count: *cint): *cint <cimport'LoadCodepoints', cinclude'<raylib.h>',nodecl> end
 function rl.unloadCodepoints(codepoints: *cint): void <cimport'UnloadCodepoints', cinclude'<raylib.h>',nodecl> end
-function rl.getCodepointsCount(text: cstring): cint <cimport'GetCodepointsCount', cinclude'<raylib.h>',nodecl> end
+function rl.getCodepointCount(text: cstring): cint <cimport'GetCodepointCount', cinclude'<raylib.h>',nodecl> end
 function rl.getCodepoint(text: cstring, codepointSize: *cint): cint <cimport'GetCodepoint', cinclude'<raylib.h>',nodecl> end
 function rl.getCodePointNext(text: cstring, codepointSize: *cint): cint <cimport'GetCodepointNext', cinclude'<raylib.h>',nodecl> end
 function rl.getCodePointPrevious(text: cstring, codepointSize: *cint): cint <cimport'GetCodepointPrevious', cinclude'<raylib.h>',nodecl> end
 function rl.codepointToUTF8(codepoint: cint, byteSize: *cint): cstring <cimport'CodepointToUTF8', cinclude'<raylib.h>',nodecl> end
-function rl.loadUTF8(codepoints: *cint, length:cint): cchar <cimport'LoadUTF8', cinclude'<raylib.h>',nodecl> end
+function rl.loadUTF8(codepoints: *cint, length: cint): *cchar <cimport'LoadUTF8', cinclude'<raylib.h>',nodecl> end
 function rl.unloadUTF8(text: *cchar): void <cimport'UnloadUTF8', cinclude'<raylib.h>',nodecl> end
 
 
@@ -1357,11 +1361,11 @@ function rl.textLength(text: cstring): cuint <cimport'TextLength', cinclude'<ray
 function rl.textFormat(text: cstring, ...: cvarargs): cstring <cimport'TextFormat', cinclude'<raylib.h>',nodecl> end
 function rl.textSubtext(text: cstring, position: cint, length: cint): cstring <cimport'TextSubtext', cinclude'<raylib.h>',nodecl> end
 function rl.textRemoveSpaces(text: cstring): cstring <cimport'TextRemoveSpaces', cinclude'<raylib.h>',nodecl> end
-function rl.getTextBetween(text: cstring, begin: cstring, End: cstring): cstring <cimport'GetTextBetween', cinclude'<raylib.h>',nodecl> end
+function rl.getTextBetween(text: cstring, begin: cstring, ending: cstring): cstring <cimport'GetTextBetween', cinclude'<raylib.h>',nodecl> end
 function rl.textReplace(text: cstring, search: cstring, replacement: cstring): cstring <cimport'TextReplace', cinclude'<raylib.h>',nodecl> end
 function rl.textReplaceAlloc(text: cstring, search: cstring, replacement: cstring): cstring <cimport'TextReplaceAlloc', cinclude'<raylib.h>',nodecl> end
-function rl.textReplaceBetween(text: cstring, begin: cstring, End: cstring, replacement: cstring): cstring <cimport'TextReplaceBetween', cinclude'<raylib.h>',nodecl> end
-function rl.textReplaceBetweenAlloc(text: cstring, begin: cstring, End: cstring, replacement: cstring): cstring <cimport'TextReplaceBetweenAlloc', cinclude'<raylib.h>',nodecl> end
+function rl.textReplaceBetween(text: cstring, begin: cstring, ending: cstring, replacement: cstring): cstring <cimport'TextReplaceBetween', cinclude'<raylib.h>',nodecl> end
+function rl.textReplaceBetweenAlloc(text: cstring, begin: cstring, ending: cstring, replacement: cstring): cstring <cimport'TextReplaceBetweenAlloc', cinclude'<raylib.h>',nodecl> end
 function rl.textInsert(text: cstring, insert: cstring, position: cint): cstring <cimport'TextInsert', cinclude'<raylib.h>',nodecl> end
 function rl.textInsertAlloc(text: cstring, insert: cstring, position: cint): cstring <cimport'TextInsertAlloc', cinclude'<raylib.h>',nodecl> end
 function rl.textJoin(textList: *cstring, count: cint, delimiter: cstring): cstring <cimport'TextJoin', cinclude'<raylib.h>',nodecl> end
@@ -1397,8 +1401,8 @@ function rl.drawCylinder(position: rl.vector3, radiusTop: float32, radiusBottom:
 function rl.drawCylinderEx(startPos: rl.vector3, endPos: rl.vector3, startRadius: float32, endRadius: float32, sides: cint, color: rl.color): void <cimport'DrawCylinderEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawCylinderWires(position: rl.vector3, radiusTop: float32, radiusBottom: float32, height: float32, slices: cint, color: rl.color): void <cimport'DrawCylinderWires', cinclude'<raylib.h>',nodecl> end
 function rl.drawCylinderWiresEx(startPos: rl.vector3, endPos: rl.vector3, startRadius: float32, endRadius: float32, sides: cint, color: rl.color): void <cimport'DrawCylinderWiresEx', cinclude'<raylib.h>',nodecl> end
-function rl.drawCapsule(startPos: rl.vector3, endPos: rl.vector3, radius: float32, slices: cint, rings: cint, color: rl.color): void <cimport'DrawCapsule', cinclude'<raylib.h>',nodecl> end
-function rl.drawCapsuleWires(startPos: rl.vector3, endPos: rl.vector3, radius: float32, slices: cint, rings: cint, color: rl.color): void <cimport'DrawCapsuleWires', cinclude'<raylib.h>',nodecl> end
+function rl.drawCapsule(startPos: rl.vector3, endPos: rl.vector3, radius: float32, rings: cint, slices: cint, color: rl.color): void <cimport'DrawCapsule', cinclude'<raylib.h>',nodecl> end
+function rl.drawCapsuleWires(startPos: rl.vector3, endPos: rl.vector3, radius: float32, rings: cint, slices: cint, color: rl.color): void <cimport'DrawCapsuleWires', cinclude'<raylib.h>',nodecl> end
 function rl.drawPlane(centerPos: rl.vector3, size: rl.vector2, color: rl.color): void <cimport'DrawPlane', cinclude'<raylib.h>',nodecl> end
 function rl.drawRay(ray: rl.ray, color: rl.color): void <cimport'DrawRay', cinclude'<raylib.h>',nodecl> end
 function rl.drawGrid(slices: cint, spacing: float32): void <cimport'DrawGrid', cinclude'<raylib.h>',nodecl> end
@@ -1421,7 +1425,7 @@ function rl.drawModelWires(model: rl.model, position: rl.vector3, scale: float32
 function rl.drawModelWiresEx(model: rl.model, position: rl.vector3, rotationAxis: rl.vector3, rotationAngle: float32, scale: rl.vector3, tint: rl.color): void <cimport'DrawModelWiresEx', cinclude'<raylib.h>',nodecl> end
 function rl.drawBoundingBox(box: rl.boundingBox, color: rl.color): void <cimport'DrawBoundingBox', cinclude'<raylib.h>',nodecl> end
 function rl.drawBillboard(camera: rl.camera, texture: rl.texture2D, center: rl.vector3, scale: float32, tint: rl.color): void <cimport'DrawBillboard', cinclude'<raylib.h>',nodecl> end
-function rl.drawBillboardRec(camera: rl.camera, texture: rl.texture2D, source: rl.rectangle, center: rl.vector3, size: float32, tint: rl.color): void <cimport'DrawBillboardRec', cinclude'<raylib.h>',nodecl> end
+function rl.drawBillboardRec(camera: rl.camera, texture: rl.texture2D, source: rl.rectangle, center: rl.vector3, size: rl.vector2, tint: rl.color): void <cimport'DrawBillboardRec', cinclude'<raylib.h>',nodecl> end
 function rl.drawBillboardPro(camera: rl.camera, texture: rl.texture2D, source: rl.rectangle, position: rl.vector3, up: rl.vector3, size: rl.vector2, origin: rl.vector2, rotation: float32, tint: rl.color): void <cimport'DrawBillboardPro', cinclude'<raylib.h>',nodecl> end
 
 -- Mesh management functions
@@ -1453,7 +1457,7 @@ function rl.loadMaterials(fileName: cstring, materialCount: *cint): *rl.material
 function rl.loadMaterialDefault(): rl.material <cimport'LoadMaterialDefault', cinclude'<raylib.h>',nodecl> end
 function rl.isMaterialValid(material: rl.material): boolean <cimport'IsMaterialValid', cinclude'<raylib.h>',nodecl> end
 function rl.unloadMaterial(material: rl.material): void <cimport'UnloadMaterial', cinclude'<raylib.h>',nodecl> end
-function rl.setMaterialtexture(material: *rl.material, mapType: cint, texture: rl.texture2D): void <cimport'SetMaterialtexture', cinclude'<raylib.h>',nodecl> end
+function rl.setMaterialTexture(material: *rl.material, mapType: cint, texture: rl.texture2D): void <cimport'SetMaterialTexture', cinclude'<raylib.h>',nodecl> end
 function rl.setModelMeshMaterial(model: *rl.model, meshId: cint, materialId: cint): void <cimport'SetModelMeshMaterial', cinclude'<raylib.h>',nodecl> end
 
 -- Model animations loading/unloading functions
@@ -1469,6 +1473,7 @@ function rl.checkCollisionBoxes(box1: rl.boundingBox, box2: rl.boundingBox): boo
 function rl.checkCollisionBoxSphere(box: rl.boundingBox, center: rl.vector3, radius: float32): boolean <cimport'CheckCollisionBoxSphere', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionSphere(ray: rl.ray, center: rl.vector3, radius: float32): rl.rayCollision <cimport'GetRayCollisionSphere', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionBox(ray: rl.ray, box: rl.boundingBox): rl.rayCollision <cimport'GetRayCollisionBox', cinclude'<raylib.h>',nodecl> end
+function rl.getRayCollisionMesh(ray: rl.ray, mesh: rl.mesh, transform: rl.matrix): rl.rayCollision <cimport'GetRayCollisionMesh', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionTriangle(ray: rl.ray, p1: rl.vector3, p2: rl.vector3, p3: rl.vector3): rl.rayCollision <cimport'GetRayCollisionTriangle', cinclude'<raylib.h>',nodecl> end
 function rl.getRayCollisionQuad(ray: rl.ray, p1: rl.vector3, p2: rl.vector3, p3: rl.vector3, p4: rl.vector3): rl.rayCollision <cimport'GetRayCollisionQuad', cinclude'<raylib.h>',nodecl> end
 
@@ -1503,7 +1508,6 @@ function rl.playSound(sound: rl.sound): void <cimport'PlaySound', cinclude'<rayl
 function rl.stopSound(sound: rl.sound): void <cimport'StopSound', cinclude'<raylib.h>',nodecl> end
 function rl.pauseSound(sound: rl.sound): void <cimport'PauseSound', cinclude'<raylib.h>',nodecl> end
 function rl.resumeSound(sound: rl.sound): void <cimport'ResumeSound', cinclude'<raylib.h>',nodecl> end
-function rl.getSoundsPlaying(): cint <cimport'GetSoundsPlaying', cinclude'<raylib.h>',nodecl> end
 function rl.isSoundPlaying(sound: rl.sound): boolean <cimport'IsSoundPlaying', cinclude'<raylib.h>',nodecl> end
 function rl.setSoundVolume(sound: rl.sound, volume: float32): void <cimport'SetSoundVolume', cinclude'<raylib.h>',nodecl> end
 function rl.setSoundPitch(sound: rl.sound, pitch: float32): void <cimport'SetSoundPitch', cinclude'<raylib.h>',nodecl> end
@@ -1520,8 +1524,8 @@ function rl.loadMusicStreamFromMemory(fileType: cstring, data: *cuchar, dataSize
 function rl.isMusicValid(music: rl.music): boolean <cimport'IsMusicValid', cinclude'<raylib.h>',nodecl> end
 function rl.unloadMusicStream(music: rl.music): void <cimport'UnloadMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.playMusicStream(music: rl.music): void <cimport'PlayMusicStream', cinclude'<raylib.h>',nodecl> end
-function rl.isMusicPlaying(music: rl.music): boolean <cimport'IsMusicPlaying', cinclude'<raylib.h>',nodecl> end
-function rl.IsMusicStreamPlaying(music: rl.music): boolean <cimport'IsMusicStreamPlaying', cinclude'<raylib.h>',nodecl> end
+function rl.isMusicPlaying(music: rl.music): boolean <cimport'IsMusicStreamPlaying', cinclude'<raylib.h>',nodecl> end
+function rl.isMusicStreamPlaying(music: rl.music): boolean <cimport'IsMusicStreamPlaying', cinclude'<raylib.h>',nodecl> end
 function rl.updateMusicStream(music: rl.music): void <cimport'UpdateMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.stopMusicStream(music: rl.music): void <cimport'StopMusicStream', cinclude'<raylib.h>',nodecl> end
 function rl.pauseMusicStream(music: rl.music): void <cimport'PauseMusicStream', cinclude'<raylib.h>',nodecl> end
@@ -1626,6 +1630,7 @@ global rl.BLUE: rl.color <cimport, nodecl,const>
 global rl.DARKBLUE: rl.color <cimport, nodecl,const>
 global rl.PURPLE: rl.color <cimport, nodecl,const>
 global rl.VIOLET: rl.color <cimport, nodecl,const>
+global rl.DARKPURPLE: rl.color <cimport, nodecl,const>
 global rl.BEIGE: rl.color <cimport, nodecl,const>
 global rl.BROWN: rl.color <cimport, nodecl,const>
 global rl.DARKBROWN: rl.color <cimport, nodecl,const>
@@ -1652,8 +1657,8 @@ global rl.EPSILON: float32 <cimport'EPSILON', cinclude'<raymath.h>',nodecl,const
 -- ----------------------------------------------------------------------------------
 
 function rl.clamp(value: float32, min: float32, max: float32): float32 <cimport'Clamp', cinclude'<raymath.h>',nodecl> end
-function rl.lerp(start: float32, _end: float32, amount: float32): float32 <cimport'Lerp', cinclude'<raymath.h>',nodecl> end
-function rl.normalise(value: float32, start: float32, _end: float32): float32 <cimport'Normalize', cinclude'<raymath.h>',nodecl> end
+function rl.lerp(start: float32, ending: float32, amount: float32): float32 <cimport'Lerp', cinclude'<raymath.h>',nodecl> end
+function rl.normalise(value: float32, start: float32, ending: float32): float32 <cimport'Normalize', cinclude'<raymath.h>',nodecl> end
 function rl.remap(value: float32, inputStart: float32, inputEnd: float32, outputStart: float32, outputEnd: float32): float32 <cimport'Remap', cinclude'<raymath.h>',nodecl> end
 function rl.wrap(value: float32, min: float32, max: float32): float32 <cimport'Wrap', cinclude'<raymath.h>',nodecl> end
 function rl.floatEquals(x: float32, y: float32): cint <cimport'FloatEquals', cinclude'<raymath.h>',nodecl> end
@@ -1677,6 +1682,7 @@ function rl.vector2.subtractValue(v: rl.vector2, sub: float32): rl.vector2 <cimp
 function rl.vector2.length(v: rl.vector2): float32 <cimport'Vector2Length', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.lengthSqr(v: rl.vector2): float32 <cimport'Vector2LengthSqr', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.dotProduct(v1: rl.vector2, v2: rl.vector2): float32 <cimport'Vector2DotProduct', cinclude'<raymath.h>',nodecl> end
+function rl.vector2.crossProduct(v1: rl.vector2, v2: rl.vector2): float32 <cimport'Vector2CrossProduct', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.distance(v1: rl.vector2, v2: rl.vector2): float32 <cimport'Vector2Distance', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.distanceSqr(v1: rl.vector2, v2: rl.vector2): float32 <cimport'Vector2DistanceSqr', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.angle(v1: rl.vector2, v2: rl.vector2): float32 <cimport'Vector2Angle', cinclude'<raymath.h>',nodecl> end
@@ -1694,11 +1700,14 @@ function rl.vector2.moveTowards(v: rl.vector2, target: rl.vector2, maxDistance: 
 function rl.vector2.invert(v: rl.vector2): rl.vector2 <cimport'Vector2Invert', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.clamp(v: rl.vector2, min: rl.vector2, max: rl.vector2): rl.vector2 <cimport'Vector2Clamp', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.clampValue(v: rl.vector2, min: float32, max: float32): rl.vector2 <cimport'Vector2ClampValue', cinclude'<raymath.h>',nodecl> end
+function rl.vector2.min(v1: rl.vector2, v2: rl.vector2): rl.vector2 <cimport'Vector2Min', cinclude'<raymath.h>',nodecl> end
+function rl.vector2.max(v1: rl.vector2, v2: rl.vector2): rl.vector2 <cimport'Vector2Max', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.equals(p: rl.vector2, q: rl.vector2): boolean <cimport'Vector2Equals', cinclude'<raymath.h>',nodecl> end
+function rl.vector2.refract(v: rl.vector2, n: rl.vector2, r: float32): rl.vector2 <cimport'Vector2Refract', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.__len(v: rl.vector2): float32 <cimport'Vector2Length', cinclude'<raymath.h>',nodecl> end
 function rl.vector2.__eq(v1: rl.vector2, v2: rl.vector2): boolean <cimport'Vector2Equals', cinclude'<raymath.h>',nodecl> end
 
-function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept): rl.vector2
+function rl.vector2.__add(val1: rl.vector2OrScalarConcept, val2: rl.vector2OrScalarConcept): rl.vector2
     ## if val1.type.is_vector2 and val2.type.is_vector2 then
         return (@rl.vector2){val1.x + val2.x, val1.y + val2.y}
     ## elseif val1.type.is_vector2 then
@@ -1708,7 +1717,7 @@ function rl.vector2.__add(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_or_scalar_concept): rl.vector2
+function rl.vector2.__sub(val1: rl.vector2OrScalarConcept, val2: rl.vector2OrScalarConcept): rl.vector2
     ## if val1.type.is_vector2 and val2.type.is_vector2 then
         return (@rl.vector2){val1.x - val2.x, val1.y - val2.y}
     ## elseif val1.type.is_vector2 then
@@ -1718,7 +1727,7 @@ function rl.vector2.__sub(val1: rl.vector2_or_scalar_concept, val2: rl.vector2_o
     ## end
 end
 
-function rl.vector2.__mul(v1: rl.vector2_or_scalar_concept, v2: rl.vector2_or_scalar_concept): rl.vector2
+function rl.vector2.__mul(v1: rl.vector2OrScalarConcept, v2: rl.vector2OrScalarConcept): rl.vector2
     ## if v1.type.is_vector2 and v2.type.is_vector2 then
         return (@rl.vector2){v1.x * v2.x, v1.y * v2.y}
     ## elseif v1.type.is_vector2 then
@@ -1732,7 +1741,7 @@ function rl.vector2.__unm(v: rl.vector2): rl.vector2
     return (@rl.vector2){-v.x, -v.y}
 end
 
-function rl.vector2.__div(v1: rl.vector2_or_scalar_concept, v2: rl.vector2_or_scalar_concept): rl.vector2
+function rl.vector2.__div(v1: rl.vector2OrScalarConcept, v2: rl.vector2OrScalarConcept): rl.vector2
     ## if v1.type.is_vector2 and v2.type.is_vector2 then
         return (@rl.vector2){v1.x / v2.x, v1.y / v2.y}
     ## elseif v1.type.is_vector2 then
@@ -1810,6 +1819,7 @@ function rl.vector3.transform(v: rl.vector3, mat: rl.matrix): rl.vector3 <cimpor
 function rl.vector3.rotateByQuaternion(v: rl.vector3, q: rl.quaternion): rl.vector3 <cimport'Vector3RotateByQuaternion', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.rotateByAxisAngle(v: rl.vector3, axis: rl.vector3, angle: float32): rl.vector3 <cimport'Vector3RotateByAxisAngle', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.lerp(v1: rl.vector3, v2: rl.vector3, amount: float32): rl.vector3 <cimport'Vector3Lerp', cinclude'<raymath.h>',nodecl> end
+function rl.vector3.cubicHermite(v1: rl.vector3, tangent1: rl.vector3, v2: rl.vector3, tangent2: rl.vector3, amount: float32): rl.vector3 <cimport'Vector3CubicHermite', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.reflect(v: rl.vector3, normal: rl.vector3): rl.vector3 <cimport'Vector3Reflect', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.min(v1: rl.vector3, v2: rl.vector3): rl.vector3 <cimport'Vector3Min', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.max(v1: rl.vector3, v2: rl.vector3): rl.vector3 <cimport'Vector3Max', cinclude'<raymath.h>',nodecl> end
@@ -1820,10 +1830,11 @@ function rl.vector3.clamp(v: rl.vector3, min: rl.vector3, max: rl.vector3): rl.v
 function rl.vector3.clampValue(v: rl.vector3, min: float32, max: float32): rl.vector3 <cimport'Vector3ClampValue', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.equals(p: rl.vector3, q: rl.vector3): boolean <cimport'Vector3Equals', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.refract(v: rl.vector3, n: rl.vector3, r: float32): rl.vector3 <cimport'Vector3Refract', cinclude'<raymath.h>',nodecl> end
+function rl.vector3.moveTowards(v: rl.vector3, target: rl.vector3, maxDistance: float32): rl.vector3 <cimport'Vector3MoveTowards', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.__len(v: rl.vector3): float32 <cimport'Vector3Length', cinclude'<raymath.h>',nodecl> end
 function rl.vector3.__eq(v1: rl.vector3, v2: rl.vector3): boolean <cimport'Vector3Equals', cinclude'<raymath.h>',nodecl> end
 
-function rl.vector3.__add(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept): rl.vector3
+function rl.vector3.__add(val1: rl.vector3OrScalarConcept, val2: rl.vector3OrScalarConcept): rl.vector3
     ## if val1.type.is_vector3 and val2.type.is_vector3 then
         return (@rl.vector3){val1.x + val2.x, val1.y + val2.y, val1.z + val2.z}
     ## elseif val1.type.is_vector3 then
@@ -1833,7 +1844,7 @@ function rl.vector3.__add(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_o
     ## end
 end
 
-function rl.vector3.__sub(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept): rl.vector3
+function rl.vector3.__sub(val1: rl.vector3OrScalarConcept, val2: rl.vector3OrScalarConcept): rl.vector3
     ## if val1.type.is_vector3 and val2.type.is_vector3 then
         return (@rl.vector3){val1.x - val2.x, val1.y - val2.y, val1.z - val2.z}
     ## elseif val1.type.is_vector3 then
@@ -1843,12 +1854,12 @@ function rl.vector3.__sub(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_o
     ## end
 end
 
-function rl.vector3.__mul(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept): rl.vector3
+function rl.vector3.__mul(val1: rl.vector3OrScalarConcept, val2: rl.vector3OrScalarConcept): rl.vector3
     ## if val1.type.is_vector3 and val2.type.is_vector3 then
         return (@rl.vector3){val1.x * val2.x, val1.y * val2.y, val1.z * val2.z}
-    ## elseif val1.type.is_vector2 then
+    ## elseif val1.type.is_vector3 then
         return (@rl.vector3){val1.x * val2, val1.y * val2, val1.z * val2}
-    ## elseif val2.type.is_vector2 then
+    ## elseif val2.type.is_vector3 then
         return (@rl.vector3){val1 * val2.x, val1 * val2.y, val1 * val2.z}
     ## end
 end
@@ -1857,7 +1868,7 @@ function rl.vector3.__unm(v: rl.vector3): rl.vector3
     return (@rl.vector3){-v.x, -v.y, -v.z}
 end
 
-function rl.vector3.__div(val1: rl.vector3_or_scalar_concept, val2: rl.vector3_or_scalar_concept): rl.vector3
+function rl.vector3.__div(val1: rl.vector3OrScalarConcept, val2: rl.vector3OrScalarConcept): rl.vector3
     ## if val1.type.is_vector3 and val2.type.is_vector3 then
         return (@rl.vector3){val1.x / val2.x, val1.y / val2.y, val1.z / val2.z}
     ## elseif val1.type.is_vector3 then
@@ -1880,7 +1891,7 @@ function rl.vector3.__idiv(v1: rl.vector3, v2: rl.vector3): rl.vector3
 end 
 
 function rl.vector3.__tdiv(v1: rl.vector3, v2: rl.vector3): rl.vector3
-    return (@rl.vector3){v1.x /// v2.x, v1.y /// v2.y, v1.z // v2.z}
+    return (@rl.vector3){v1.x /// v2.x, v1.y /// v2.y, v1.z /// v2.z}
 end
 
 function rl.vector3.__pow(v: rl.vector3, n: number): rl.vector3
@@ -1892,7 +1903,7 @@ function rl.vector3.__tmod(v1: rl.vector3, v2: rl.vector3): rl.vector3
 end
 
 function rl.vector3.__mod(v1: rl.vector3, v2: rl.vector3): rl.vector3
-    return (@rl.vector3){v1.x % v2.x, v1.y % v2.y, v1.y % v2.z}
+    return (@rl.vector3){v1.x % v2.x, v1.y % v2.y, v1.z % v2.z}
 end
 
 function rl.vector3.__tostring(v: rl.vector3): string
@@ -1909,6 +1920,24 @@ function rl.vector3.toFloatV(v: rl.vector3): rl.float3
     return buffer
 end
 
+function rl.vector4.zero(): rl.vector4 <inline>
+    return (@rl.vector4){0, 0, 0, 0}
+end
+
+function rl.vector4.one(): rl.vector4 <inline>
+    return (@rl.vector4){1, 1, 1, 1}
+end
+
+function rl.vector4.lengthSqr(v: rl.vector4): float32 <cimport'Vector4LengthSqr', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.dotProduct(v1: rl.vector4, v2: rl.vector4): float32 <cimport'Vector4DotProduct', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.distance(v1: rl.vector4, v2: rl.vector4): float32 <cimport'Vector4Distance', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.distanceSqr(v1: rl.vector4, v2: rl.vector4): float32 <cimport'Vector4DistanceSqr', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.negate(v: rl.vector4): rl.vector4 <cimport'Vector4Negate', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.normalize(v: rl.vector4): rl.vector4 <cimport'Vector4Normalize', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.min(v1: rl.vector4, v2: rl.vector4): rl.vector4 <cimport'Vector4Min', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.max(v1: rl.vector4, v2: rl.vector4): rl.vector4 <cimport'Vector4Max', cinclude'<raymath.h>',nodecl> end
+function rl.vector4.moveTowards(v: rl.vector4, target: rl.vector4, maxDistance: float32): rl.vector4 <cimport'Vector4MoveTowards', cinclude'<raymath.h>',nodecl> end
+
 -- ----------------------------------------------------------------------------------
 -- Module Functions Definition - Matrix math
 -- ----------------------------------------------------------------------------------
@@ -1921,6 +1950,7 @@ function rl.matrix.identity(): rl.matrix <cimport'MatrixIdentity', cinclude'<ray
 function rl.matrix.add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.subtract(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.multiply(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.multiplyValue(left: rl.matrix, value: float32): rl.matrix <cimport'MatrixMultiplyValue', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.translate(x: float32, y: float32, z: float32): rl.matrix <cimport'MatrixTranslate', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.rotate(axis: rl.vector3, angle: float32): rl.matrix <cimport'MatrixRotate', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.rotateX(angle: float32): rl.matrix <cimport'MatrixRotateX', cinclude'<raymath.h>',nodecl> end
@@ -1929,14 +1959,16 @@ function rl.matrix.rotateZ(angle: float32): rl.matrix <cimport'MatrixRotateZ', c
 function rl.matrix.rotateXYZ(angle: rl.vector3): rl.matrix <cimport'MatrixRotateXYZ', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.rotateZYX(angle: rl.vector3): rl.matrix <cimport'MatrixRotateZYX', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.scale(x: float32, y: float32, z: float32): rl.matrix <cimport'MatrixScale', cinclude'<raymath.h>',nodecl> end
-function rl.matrix.frustum(left: number, right: number, bottom: number, top: number, near: number, far: number): rl.matrix <cimport'MatrixFrustum', cinclude'<raymath.h>',nodecl> end
-function rl.matrix.perspective(fovy: number, aspect: number, near: number, far: number): rl.matrix <cimport'MatrixPerspective', cinclude'<raymath.h>',nodecl> end
-function rl.matrix.ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): rl.matrix <cimport'MatrixOrtho', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.frustum(left: float64, right: float64, bottom: float64, top: float64, near: float64, far: float64): rl.matrix <cimport'MatrixFrustum', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.perspective(fovy: float64, aspect: float64, near: float64, far: float64): rl.matrix <cimport'MatrixPerspective', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.ortho(left: float64, right: float64, bottom: float64, top: float64, near: float64, far: float64): rl.matrix <cimport'MatrixOrtho', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.lookAt(eye: rl.vector3, target: rl.vector3, up: rl.vector3): rl.matrix <cimport'MatrixLookAt', cinclude'<raymath.h>',nodecl> end
 function rl.matrix.toFloatV(mat: rl.matrix): rl.float16 <cimport'MatrixToFloatV', cinclude'<raymath.h>',nodecl> end
-function rl.matrix.__add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', nodecl> end
-function rl.matrix.__sub(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', nodecl> end
-function rl.matrix.__mul(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', nodecl> end
+function rl.matrix.compose(translation: rl.vector3, rotation: rl.quaternion, scale: rl.vector3): rl.matrix <cimport'MatrixCompose', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.decompose(mat: rl.matrix, translation: *rl.vector3, rotation: *rl.quaternion, scale: *rl.vector3): void <cimport'MatrixDecompose', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.__add(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixAdd', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.__sub(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixSubtract', cinclude'<raymath.h>',nodecl> end
+function rl.matrix.__mul(left: rl.matrix, right: rl.matrix): rl.matrix <cimport'MatrixMultiply', cinclude'<raymath.h>',nodecl> end
 
 -- ----------------------------------------------------------------------------------
 -- Module Functions Definition - Quaternion math
@@ -1949,12 +1981,13 @@ function rl.quaternion.identity(): rl.quaternion <cimport'QuaternionIdentity', c
 function rl.quaternion.length(q: rl.quaternion): float32  <cimport'QuaternionLength', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.normalise(q: rl.quaternion): rl.quaternion <cimport'QuaternionNormalize', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.invert(q: rl.quaternion): rl.quaternion <cimport'QuaternionInvert', cinclude'<raymath.h>',nodecl> end
-function rl.quaternion.multiply(): rl.quaternion <cimport'QuaternionMultiply', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.multiply(q1: rl.quaternion, q2: rl.quaternion): rl.quaternion <cimport'QuaternionMultiply', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.scale(q: rl.quaternion, mul: float32): rl.quaternion <cimport'QuaternionScale', cinclude'<raymath.h>',nodecl> end
-function rl.quaternion.divide(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionDivide', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.divide(q1: rl.quaternion, q2: rl.quaternion): rl.quaternion <cimport'QuaternionDivide', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.lerp(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionLerp', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.nLerp(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionNlerp', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.sLerp(q1: rl.quaternion, q2: rl.quaternion, amount: float32): rl.quaternion <cimport'QuaternionSlerp', cinclude'<raymath.h>',nodecl> end
+function rl.quaternion.cubicHermiteSpline(q1: rl.quaternion, outTangent1: rl.quaternion, q2: rl.quaternion, inTangent2: rl.quaternion, t: float32): rl.quaternion <cimport'QuaternionCubicHermiteSpline', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.fromVector3ToVector3(from: rl.vector3, to: rl.vector3): rl.quaternion <cimport'QuaternionFromVector3ToVector3', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.fromMatrix(mat: rl.matrix): rl.quaternion <cimport'QuaternionFromMatrix', cinclude'<raymath.h>',nodecl> end
 function rl.quaternion.toMatrix(q: rl.quaternion): rl.matrix <cimport'QuaternionToMatrix', cinclude'<raymath.h>',nodecl> end

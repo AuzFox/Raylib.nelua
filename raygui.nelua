@@ -63,7 +63,7 @@ function rlgui.getTextWidth(text: cstring): cint <cimport'GuiGetTextWidth', cinc
 global rlgui.styleProp: type <cimport'GuiStyleProp', cinclude'<raygui.h>',nodecl> = @record{
   controlId: cushort,
   propertyId: cushort,
-  propertyValue: cuint
+  propertyValue: cint
 }
 
 --------------------------------------------------------------------------------------------------------------------------
@@ -283,7 +283,8 @@ function rlgui.scrollPanel(bounds: rl.rectangle, text: cstring, content: rl.rect
 function rlgui.label(bounds: rl.rectangle, text: cstring): cint <cimport'GuiLabel', cinclude'<raygui.h>',nodecl> end
 function rlgui.button(bounds: rl.rectangle, text: cstring): cint <cimport'GuiButton', cinclude'<raygui.h>',nodecl> end
 function rlgui.labelButton(bounds: rl.rectangle, text: cstring): cint <cimport'GuiLabelButton', cinclude'<raygui.h>',nodecl> end
-function rlgui.toggle(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiToggle', cinclude'<raygui.h>',nodecl> end
+function rlgui.toggle(bounds: rl.rectangle, text: cstring, active: *boolean): cint <cimport'GuiToggle', cinclude'<raygui.h>',nodecl> end
+function rlgui.toggleSlider(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiToggleSlider', cinclude'<raygui.h>',nodecl> end
 function rlgui.toggleGroup(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiToggleGroup', cinclude'<raygui.h>',nodecl> end
 function rlgui.checkBox(bounds: rl.rectangle, text: cstring, checked: *boolean): cint <cimport'GuiCheckBox', cinclude'<raygui.h>',nodecl> end
 function rlgui.comboBox(bounds: rl.rectangle, text: cstring, active: *cint): cint <cimport'GuiComboBox', cinclude'<raygui.h>',nodecl> end
